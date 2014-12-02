@@ -6,15 +6,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 
-/**
- * Created by GBeguin on 27/11/2014.
- */
 public class ReceiveThread extends Thread {
 
     private static final String TAG = "RECEIVE_THREAD";
@@ -25,30 +21,30 @@ public class ReceiveThread extends Thread {
 
     private final Context mContext;
     private final BluetoothServerSocket mSocket;
-    private boolean running;
+    private boolean mRunning;
 
     public ReceiveThread(Context context, BluetoothServerSocket serverSocket) {
         if (DEBUG)
             Log.d(TAG, "Create thread");
         mContext = context;
         mSocket = serverSocket;
-        running = false;
+        mRunning = false;
     }
 
     @Override
     public void run() {
         Log.i(TAG, "Run thread");
-        BluetoothSocket socket = null;
+        BluetoothSocket socket;
         byte[] buffer = new byte[100];
         // Keep listening until exception occurs or a socket is returned
-        while (running) {
+        while (mRunning) {
             try {
                 if (DEBUG)
                     Log.d(TAG, "Waiting for connection");
                 socket = mSocket.accept();
             } catch (IOException e) {
                 e.printStackTrace();
-                running = false;
+                mRunning = false;
                 break;
             }
 
@@ -109,6 +105,7 @@ public class ReceiveThread extends Thread {
                             editor.putLong("latitude", Double.doubleToRawLongBits(location.getLatitude()));
                             editor.putLong("longitude", Double.doubleToRawLongBits(location.getLongitude()));
                             editor.putLong("accuracy", Double.doubleToRawLongBits(location.getAccuracy()));
+                            editor.apply();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -126,14 +123,14 @@ public class ReceiveThread extends Thread {
     public synchronized void start() {
         if (DEBUG)
             Log.d(TAG, "Start thread");
-        running = true;
+        mRunning = true;
         super.start();
     }
 
     public void cancel() {
         if (DEBUG)
             Log.d(TAG, "Stop thread");
-        running = false;
+        mRunning = false;
     }
 
 }
