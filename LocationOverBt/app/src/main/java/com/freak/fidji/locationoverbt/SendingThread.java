@@ -51,9 +51,10 @@ public class SendingThread extends Thread {
 
     @Override
     public void run() {
+        boolean connected = false;
         LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
-        while (mRunning = true) {
+        while (mRunning == true) {
             Log.i(TAG, "Retrieve location " + mDevice.getAddress());
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
@@ -67,20 +68,24 @@ public class SendingThread extends Thread {
                 Log.i(TAG, "Connect to socket " + mDevice.getAddress());
                 try {
                     mSocket.connect();
+                    connected = true;
                 } catch (IOException e) {
                     Log.i(TAG, "Error while connecting for device " + mDevice.getAddress());
+                    connected = false;
                     e.printStackTrace();
                 }
 
-                Log.i(TAG, "Send location " + mDevice.getAddress());
-                try {
-                    DataOutputStream dOut = new DataOutputStream(mSocket.getOutputStream());
-                    dOut.write(bytes, 0, bytes.length);
-                    dOut.flush();
-                    dOut.close();
-                } catch (IOException e) {
-                    Log.i(TAG, "Error while sending datas for device " + mDevice.getAddress());
-                    e.printStackTrace();
+                if (connected) {
+                    Log.i(TAG, "Send location " + mDevice.getAddress());
+                    try {
+                        DataOutputStream dOut = new DataOutputStream(mSocket.getOutputStream());
+                        dOut.write(bytes, 0, bytes.length);
+                        dOut.flush();
+                        dOut.close();
+                    } catch (IOException e) {
+                        Log.i(TAG, "Error while sending datas for device " + mDevice.getAddress());
+                        e.printStackTrace();
+                    }
                 }
 
                 try {
