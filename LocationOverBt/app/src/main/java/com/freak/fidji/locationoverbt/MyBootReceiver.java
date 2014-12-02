@@ -7,13 +7,16 @@ import android.util.Log;
 
 public class MyBootReceiver extends BroadcastReceiver {
     private static final String TAG = "BOOT_RECEIVER";
+    private static final boolean DEBUG = true;
 
     public MyBootReceiver() {
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(TAG, "Boot received");
+        if (DEBUG)
+            Log.i(TAG, "Boot received");
+
         Intent newIntent = new Intent(context, MyService.class);
         context.startService(newIntent);
     }

@@ -15,6 +15,7 @@ import java.util.Vector;
 public class MyService extends Service implements SendingThreadListener{
 
     private static final String TAG = "LOCATION_OVER_BT";
+    private static final boolean DEBUG = true;
 
     private Vector<BluetoothDevice> mConnectedDevices;
     private Vector<SendingThread> mSendingThreads;
@@ -24,7 +25,6 @@ public class MyService extends Service implements SendingThreadListener{
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -32,7 +32,8 @@ public class MyService extends Service implements SendingThreadListener{
     public void onCreate() {
         super.onCreate();
 
-        Log.d(TAG, "Create service");
+        if (DEBUG)
+            Log.d(TAG, "Create service");
 
         mConnectedDevices = new Vector<BluetoothDevice>();
         mSendingThreads = new Vector<SendingThread>();
@@ -40,12 +41,14 @@ public class MyService extends Service implements SendingThreadListener{
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter != null) {
 
-            Log.d(TAG, "Instantiate filters");
+            if (DEBUG)
+                Log.d(TAG, "Instantiate filters");
             IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
             IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
             IntentFilter filter3 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
 
-            Log.d(TAG, "Register receivers");
+            if (DEBUG)
+                Log.d(TAG, "Register receivers");
             this.registerReceiver(mReceiver, filter1);
             this.registerReceiver(mReceiver, filter2);
             this.registerReceiver(mReceiver, filter3);
@@ -55,7 +58,8 @@ public class MyService extends Service implements SendingThreadListener{
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "Unregister receiver");
+        if (DEBUG)
+            Log.d(TAG, "Unregister receiver");
         this.unregisterReceiver(mReceiver);
         super.onDestroy();
     }
@@ -68,20 +72,24 @@ public class MyService extends Service implements SendingThreadListener{
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
             if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
-                Log.d(TAG, "Device connected");
+                if (DEBUG)
+                    Log.d(TAG, "Device connected");
                 mConnectedDevices.add(device);
                 SendingThread thread = new SendingThread(context, device);
                 thread.setListener(MyService.this);
 
-                Log.d(TAG, "Start thread for device " + (mConnectedDevices.size() - 1));
+                if (DEBUG)
+                    Log.d(TAG, "Start thread for device " + (mConnectedDevices.size() - 1));
                 thread.start();
                 mSendingThreads.add(thread);
             }
             else if ((BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) || (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action))) {
-                Log.d(TAG, "Device disconnected, try to identify");
+                if (DEBUG)
+                    Log.d(TAG, "Device disconnected, try to identify");
                 for (int i = 0 ; i < mConnectedDevices.size() ; i++){
                     if (mConnectedDevices.get(i).getAddress().equals(device.getAddress())) {
-                        Log.d(TAG, "Device identified, try to stop thread");
+                        if (DEBUG)
+                            Log.d(TAG, "Device identified, try to stop thread");
                         mSendingThreads.get(i).disconnect();
                         break;
                     }
@@ -92,10 +100,12 @@ public class MyService extends Service implements SendingThreadListener{
 
     @Override
     public void onThreadFinished(BluetoothDevice device) {
-        Log.d(TAG, "onThreadFinished for device " + device.getAddress());
+        if (DEBUG)
+            Log.d(TAG, "onThreadFinished for device " + device.getAddress());
         for (int i = 0 ; i < mConnectedDevices.size() ; i++){
             if (mConnectedDevices.get(i).getAddress().equals(device.getAddress())) {
-                Log.d(TAG, "Device identified, remove thread");
+                if (DEBUG)
+                    Log.d(TAG, "Device identified, remove thread");
                 mConnectedDevices.remove(i);
                 mSendingThreads.remove(i);
                 break;

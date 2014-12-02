@@ -18,6 +18,7 @@ import java.util.UUID;
 public class SendingThread extends Thread {
 
     private static final  String TAG = "SENDING_THREAD";
+    private static final boolean DEBUG = true;
     private static final UUID mUuid = UUID.fromString("4364cf1a-7621-11e4-b116-123b93f75cba");
     private final BluetoothDevice mDevice;
     private final Context mContext;
@@ -26,14 +27,16 @@ public class SendingThread extends Thread {
     private SendingThreadListener mListener;
 
     public SendingThread(Context context, BluetoothDevice device) {
-        Log.i(TAG, "Create thread for device " + device.getAddress());
+        if (DEBUG)
+            Log.d(TAG, "Create thread for device " + device.getAddress());
         mContext = context;
         mDevice = device;
         mRunning = false;
         mListener = null;
 
-
-        Log.i(TAG, "Create socket for device " + mDevice.getAddress());        BluetoothSocket tmp = null;
+        if (DEBUG)
+            Log.d(TAG, "Create socket for device " + mDevice.getAddress());
+        BluetoothSocket tmp = null;
         // Get a BluetoothSocket to connect with the given BluetoothDevice
         try {
             // MY_UUID is the app's UUID string, also used by the server code
@@ -55,51 +58,57 @@ public class SendingThread extends Thread {
         LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
         while (mRunning == true) {
-            Log.i(TAG, "Retrieve location " + mDevice.getAddress());
+            if (DEBUG)
+                Log.d(TAG, "Retrieve location " + mDevice.getAddress());
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
             if (location != null) {
-                Log.i(TAG, "Convert location to byte array " + mDevice.getAddress());
+                if (DEBUG)
+                    Log.d(TAG, "Convert location to byte array " + mDevice.getAddress());
                 // https://gist.github.com/jacklt/6711967
                 Parcel parcel = Parcel.obtain();
                 location.writeToParcel(parcel, 0);
                 byte[] bytes = parcel.marshall();
 
-                Log.i(TAG, "Connect to socket " + mDevice.getAddress());
+                if (DEBUG)
+                    Log.d(TAG, "Connect to socket " + mDevice.getAddress());
                 try {
                     mSocket.connect();
                     connected = true;
                 } catch (IOException e) {
-                    Log.i(TAG, "Error while connecting for device " + mDevice.getAddress());
+                    if (DEBUG)
+                        Log.d(TAG, "Error while connecting for device " + mDevice.getAddress());
                     connected = false;
-                    e.printStackTrace();
                 }
 
                 if (connected) {
-                    Log.i(TAG, "Send location " + mDevice.getAddress());
+                    if (DEBUG)
+                        Log.d(TAG, "Send location " + mDevice.getAddress());
                     try {
                         DataOutputStream dOut = new DataOutputStream(mSocket.getOutputStream());
                         dOut.write(bytes, 0, bytes.length);
                         dOut.flush();
                         dOut.close();
                     } catch (IOException e) {
-                        Log.i(TAG, "Error while sending datas for device " + mDevice.getAddress());
+                        Log.e(TAG, "Error while sending datas for device " + mDevice.getAddress());
                         e.printStackTrace();
                     }
                 }
 
                 try {
-                    Log.i(TAG, "Close socket for device " + mDevice.getAddress());
+                    if (DEBUG)
+                        Log.d(TAG, "Close socket for device " + mDevice.getAddress());
                     mSocket.close();
                 } catch (IOException e) {
-                    Log.i(TAG, "Error while closing socket " + mDevice.getAddress());
+                    Log.e(TAG, "Error while closing socket " + mDevice.getAddress());
                     e.printStackTrace();
                 }
 
             }
 
             try {
-                Log.i(TAG, "Sleep 10s for device " + mDevice.getAddress());
+                if (DEBUG)
+                    Log.d(TAG, "Sleep 10s for device " + mDevice.getAddress());
                 Thread.sleep(10000);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -113,7 +122,8 @@ public class SendingThread extends Thread {
     }
 
     public void disconnect() {
-        Log.i(TAG, "Stop thread for device " + mDevice.getAddress());
+        if (DEBUG)
+            Log.d(TAG, "Stop thread for device " + mDevice.getAddress());
         mRunning = false;
     }
 
