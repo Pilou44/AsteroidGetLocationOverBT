@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -19,7 +18,7 @@ import java.util.UUID;
 /**
  * Created by GBeguin on 27/11/2014.
  */
-public class MyService extends Service implements ReceiveThreadListener {
+public class MyService extends Service {
     private static final String TAG = "MY_SERVICE";
     private static final UUID mUuid = UUID.fromString("4364cf1a-7621-11e4-b116-123b93f75cba");
 
@@ -58,9 +57,7 @@ public class MyService extends Service implements ReceiveThreadListener {
         mServerSocket = tmp;
 
         Log.d(TAG, "Create thread");
-        Toast.makeText(this, "Listening to BT RFCOMM, create thread", Toast.LENGTH_SHORT).show();
         thread = new ReceiveThread(this, mServerSocket);
-        thread.setListener(this);
         thread.start();
 
         startForeground(291112, notif);
@@ -86,21 +83,4 @@ public class MyService extends Service implements ReceiveThreadListener {
         super.onDestroy();
     }
 
-    @Override
-    public void onThreadFinished() {
-        Log.d(TAG, "Thread finished");
-        Toast.makeText(this, "Thread finished", Toast.LENGTH_SHORT).show();
-        try {
-            mServerSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @Override
-    public void onClientConnected() {
-        Log.d(TAG, "Client connected");
-        Toast.makeText(this, "Client connected", Toast.LENGTH_SHORT).show();
-    }
 }

@@ -8,7 +8,6 @@ import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -22,7 +21,6 @@ public class ReceiveThread extends Thread {
     private final Context mContext;
     private final BluetoothServerSocket mSocket;
     private boolean running;
-    private ReceiveThreadListener listener = null;
 
     public ReceiveThread(Context context, BluetoothServerSocket serverSocket) {
         Log.i(TAG, "Create thread");
@@ -45,10 +43,6 @@ public class ReceiveThread extends Thread {
                 e.printStackTrace();
                 running = false;
                 break;
-            }
-
-            if (listener != null){
-                listener.onClientConnected();
             }
 
             // If a connection was accepted
@@ -79,10 +73,6 @@ public class ReceiveThread extends Thread {
             }
         }
 
-        if (listener != null){
-            listener.onThreadFinished();
-        }
-
     }
 
     @Override
@@ -97,7 +87,4 @@ public class ReceiveThread extends Thread {
         running = false;
     }
 
-    public void setListener(ReceiveThreadListener listener) {
-        this.listener = listener;
-    }
 }
