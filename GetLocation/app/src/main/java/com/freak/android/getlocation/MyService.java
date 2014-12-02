@@ -20,6 +20,8 @@ import java.util.UUID;
  */
 public class MyService extends Service {
     private static final String TAG = "MY_SERVICE";
+    private static final boolean DEBUG = true;
+
     private static final UUID mUuid = UUID.fromString("4364cf1a-7621-11e4-b116-123b93f75cba");
 
     private BluetoothAdapter mBluetoothAdapter;
@@ -35,15 +37,16 @@ public class MyService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "Start service");
-        //Toast.makeText(this, "BT on, start service", Toast.LENGTH_SHORT).show();
+        if (DEBUG)
+            Log.d(TAG, "Start service");
 
         Notification notif = new Notification.Builder(this)
                 .setContentTitle("Get location over BT")
                 .setSmallIcon(R.drawable.ic_launcher)
                 .build();
 
-        Log.d(TAG, "Create socket");
+        if (DEBUG)
+            Log.d(TAG, "Create socket");
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         // Use a temporary object that is later assigned to mmServerSocket,
         // because mmServerSocket is final
@@ -56,7 +59,8 @@ public class MyService extends Service {
         }
         mServerSocket = tmp;
 
-        Log.d(TAG, "Create thread");
+        if (DEBUG)
+            Log.d(TAG, "Create thread");
         thread = new ReceiveThread(this, mServerSocket);
         thread.start();
 
@@ -65,8 +69,8 @@ public class MyService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "Destroy service");
-        //Toast.makeText(this, "Destroy service ", Toast.LENGTH_SHORT).show();
+        if (DEBUG)
+            Log.d(TAG, "Destroy service");
 
         stopForeground(true);
 
