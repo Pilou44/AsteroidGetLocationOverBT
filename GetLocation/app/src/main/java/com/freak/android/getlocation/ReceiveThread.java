@@ -18,6 +18,10 @@ import java.io.IOException;
 public class ReceiveThread extends Thread {
 
     private static final String TAG = "RECEIVE_THREAD";
+    private static final int TIMEOUT_IN_SECONDS = 5;
+    private static final long TIME_TO_WAIT = 100;
+    private static final int MAX_WAITING_LOOPS = TIMEOUT_IN_SECONDS * 1000 / ((int)TIME_TO_WAIT);
+    
     private final Context mContext;
     private final BluetoothServerSocket mSocket;
     private boolean running;
@@ -47,32 +51,64 @@ public class ReceiveThread extends Thread {
 
             // If a connection was accepted
             if (socket != null) {
+                Log.i(TAG, "Read datas");
+                DataInputStream dIn = null;
+
+                Log.i(TAG, "Create input reader");
                 try {
-                    Log.i(TAG, "Read datas");
-                    DataInputStream dIn = new DataInputStream(socket.getInputStream());
-
-                    while (socket.isConnected()) {
-                        int size = dIn.read(buffer, 0, buffer.length);
-
-                        Log.i(TAG, "Convert to Location");
-                        Parcel parcel = Parcel.obtain();
-                        parcel.unmarshall(buffer, 0, size);
-                        parcel.setDataPosition(0); // this is extremely important!
-                        Location location = Location.CREATOR.createFromParcel(parcel);
-
-                        Log.i(TAG, "Store location");
-                        SharedPreferences pref = mContext.getSharedPreferences(MyActivity.PREFERENCE_NAME, 0);
-                        SharedPreferences.Editor editor = pref.edit();
-                        editor.putLong("latitude", Double.doubleToRawLongBits(location.getLatitude()));
-                        editor.putLong("longitude", Double.doubleToRawLongBits(location.getLongitude()));
-                        editor.putLong("accuracy", Double.doubleToRawLongBits(location.getAccuracy()));
-                    }
+                    dIn = new DataInputStream(socket.getInputStream());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                if (dIn != null) {
+                    int loop = 0;
+                    try {
+                        while ((dIn.available() == 0) && (loop < MAX_WAITING_LOOPS)) {
+                            Log.i(TAG, "Wait for datas, loop number " + loop);
+                            Thread.sleep(TIME_TO_WAIT);
+                            loop++;
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        loop = MAX_WAITING_LOOPS;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        loop = MAX_WAITING_LOOPS;
+                    }
+
+                    if (loop < MAX_WAITING_LOOPS) {
+                        int index = 0;
+                        try {
+                            Log.i(TAG, "Read datas");
+                            while (dIn.available() > 0) {
+                                buffer[index] = dIn.readByte();
+                                index++;
+                            }
+                            Log.i(TAG, index + " bytes read");
+
+                            Log.i(TAG, "Convert to Location");
+                            Parcel parcel = Parcel.obtain();
+                            parcel.unmarshall(buffer, 0, index);
+                            parcel.setDataPosition(0); // this is extremely important!
+                            Location location = Location.CREATOR.createFromParcel(parcel);
+
+                            Log.i(TAG, "Store location");
+                            SharedPreferences pref = mContext.getSharedPreferences(MyActivity.PREFERENCE_NAME, 0);
+                            SharedPreferences.Editor editor = pref.edit();
+                            editor.putLong("latitude", Double.doubleToRawLongBits(location.getLatitude()));
+                            editor.putLong("longitude", Double.doubleToRawLongBits(location.getLongitude()));
+                            editor.putLong("accuracy", Double.doubleToRawLongBits(location.getAccuracy()));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else {
+                        Log.e(TAG, "Too much waiting loops");
+                    }
+                }
             }
         }
-
     }
 
     @Override
