@@ -9,9 +9,18 @@
     tools:context=".MyActivity">
 
     <TextView
-        android:text="@string/hello_world"
+        android:text="@string/unknown_position"
         android:id="@+id/text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+    <Button
+        android:id="@+id/go_maps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/go_button"
+        android:layout_below="@id/text"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
