@@ -114,6 +114,15 @@ public class ReceiveThread extends Thread {
                         Log.e(TAG, "Too much waiting loops");
                     }
                 }
+
+                try {
+                    if (DEBUG)
+                        Log.d(TAG, "All done, close socket");
+                    socket.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "Error while closing socket");
+                    e.printStackTrace();
+                }
             }
         }
         Log.i(TAG, "End of thread");
