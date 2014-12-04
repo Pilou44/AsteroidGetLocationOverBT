@@ -12,9 +12,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
-/**
- * Created by GBeguin on 27/11/2014.
- */
 public class SendingThread extends Thread {
 
     private static final  String TAG = "SENDING_THREAD";
@@ -41,7 +38,9 @@ public class SendingThread extends Thread {
         try {
             // MY_UUID is the app's UUID string, also used by the server code
             tmp = device.createRfcommSocketToServiceRecord(mUuid);
-        } catch (IOException e) { }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         mSocket = tmp;
     }
 
@@ -54,10 +53,10 @@ public class SendingThread extends Thread {
 
     @Override
     public void run() {
-        boolean connected = false;
+        boolean connected;
         LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
-        while (mRunning == true) {
+        while (mRunning) {
             if (DEBUG)
                 Log.d(TAG, "Retrieve location " + mDevice.getAddress());
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -65,7 +64,6 @@ public class SendingThread extends Thread {
             if (location != null) {
                 if (DEBUG)
                     Log.d(TAG, "Convert location to byte array " + mDevice.getAddress());
-                // https://gist.github.com/jacklt/6711967
                 Parcel parcel = Parcel.obtain();
                 location.writeToParcel(parcel, 0);
                 byte[] bytes = parcel.marshall();
