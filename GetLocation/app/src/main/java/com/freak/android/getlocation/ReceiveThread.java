@@ -20,14 +20,14 @@ public class ReceiveThread extends Thread {
     private static final int MAX_WAITING_LOOPS = TIMEOUT_IN_SECONDS * 1000 / ((int)TIME_TO_WAIT);
 
     private final Context mContext;
-    private final BluetoothServerSocket mSocket;
+    private final BluetoothServerSocket mServerSocket;
     private boolean mRunning;
 
     public ReceiveThread(Context context, BluetoothServerSocket serverSocket) {
         if (DEBUG)
             Log.d(TAG, "Create thread");
         mContext = context;
-        mSocket = serverSocket;
+        mServerSocket = serverSocket;
         mRunning = false;
     }
 
@@ -41,7 +41,7 @@ public class ReceiveThread extends Thread {
             try {
                 if (DEBUG)
                     Log.d(TAG, "Waiting for connection");
-                socket = mSocket.accept();
+                socket = mServerSocket.accept();
             } catch (IOException e) {
                 e.printStackTrace();
                 mRunning = false;
@@ -117,10 +117,11 @@ public class ReceiveThread extends Thread {
 
                 try {
                     if (DEBUG)
-                        Log.d(TAG, "All done, close socket");
+                        Log.d(TAG, "All done, close sockets");
                     socket.close();
+                    mServerSocket.close();
                 } catch (IOException e) {
-                    Log.e(TAG, "Error while closing socket");
+                    Log.e(TAG, "Error while closing sockets");
                     e.printStackTrace();
                 }
             }
