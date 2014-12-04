@@ -117,11 +117,19 @@ public class ReceiveThread extends Thread {
 
                 try {
                     if (DEBUG)
-                        Log.d(TAG, "All done, close sockets");
+                        Log.d(TAG, "All done, close client socket");
                     socket.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "Error while closing client socket");
+                    e.printStackTrace();
+                }
+
+                try {
+                    if (DEBUG)
+                        Log.d(TAG, "All done, close server socket");
                     mServerSocket.close();
                 } catch (IOException e) {
-                    Log.e(TAG, "Error while closing sockets");
+                    Log.e(TAG, "Error while closing server socket");
                     e.printStackTrace();
                 }
             }
