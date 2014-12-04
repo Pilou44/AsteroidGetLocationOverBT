@@ -22,6 +22,7 @@ public class ReceiveThread extends Thread {
     private final Context mContext;
     private final BluetoothServerSocket mServerSocket;
     private boolean mRunning;
+    private ReceiveThreadListener mListener = null;
 
     public ReceiveThread(Context context, BluetoothServerSocket serverSocket) {
         if (DEBUG)
@@ -46,6 +47,10 @@ public class ReceiveThread extends Thread {
                 e.printStackTrace();
                 mRunning = false;
                 break;
+            }
+
+            if (mListener != null){
+                mListener.onClientConnected();
             }
 
             // If a connection was accepted
@@ -135,6 +140,9 @@ public class ReceiveThread extends Thread {
             }
         }
         Log.i(TAG, "End of thread");
+        if (mListener != null){
+            mListener.onThreadFinished();
+        }
     }
 
     @Override
@@ -151,4 +159,7 @@ public class ReceiveThread extends Thread {
         mRunning = false;
     }
 
+    public void setListener(ReceiveThreadListener listener) {
+        this.mListener = listener;
+    }
 }

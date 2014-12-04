@@ -11,7 +11,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.UUID;
 
-public class MyService extends Service {
+public class MyService extends Service implements ReceiveThreadListener {
     private static final String TAG = "MY_SERVICE";
     private static final boolean DEBUG = true;
 
@@ -19,6 +19,7 @@ public class MyService extends Service {
 
     private BluetoothServerSocket mServerSocket;
     private ReceiveThread mThread;
+    private boolean mAlreadyConnected;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -30,11 +31,7 @@ public class MyService extends Service {
         super.onCreate();
         if (DEBUG)
             Log.d(TAG, "Start service");
-
-        Notification notif = new Notification.Builder(this)
-                .setContentTitle("Get location over BT")
-                .setSmallIcon(R.drawable.ic_launcher)
-                .build();
+        mAlreadyConnected = false;
 
         if (DEBUG)
             Log.d(TAG, "Create socket");
@@ -53,17 +50,15 @@ public class MyService extends Service {
         if (DEBUG)
             Log.d(TAG, "Create thread");
         mThread = new ReceiveThread(this, mServerSocket);
+        mThread.setListener(this);
         mThread.start();
 
-        startForeground(291112, notif);
     }
 
     @Override
     public void onDestroy() {
         if (DEBUG)
             Log.d(TAG, "Destroy service");
-
-        stopForeground(true);
 
         if (mThread != null) {
             mThread.cancel();
@@ -78,4 +73,29 @@ public class MyService extends Service {
         super.onDestroy();
     }
 
+    @Override
+    public void onThreadFinished() {
+        if (mAlreadyConnected) {
+            if (DEBUG)
+                Log.d(TAG, "Receive thread stopped,make service killable again");
+            stopForeground(true);
+            mAlreadyConnected = false;
+        }
+    }
+
+    @Override
+    public void onClientConnected() {
+        if (!mAlreadyConnected) {
+            if (DEBUG)
+                Log.d(TAG, "First connection successful, make service not killable");
+            mAlreadyConnected = true;
+            Notification notif = new Notification.Builder(this)
+                    .setContentTitle(this.getString(R.string.notif_title))
+                    .setContentText(this.getString(R.string.notif_text))
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .build();
+
+            startForeground(291112, notif);
+        }
+    }
 }
