@@ -34,10 +34,11 @@ public class ReceiveThread extends Thread {
     @Override
     public void run() {
         Log.i(TAG, "Run thread");
-        BluetoothSocket socket = null;
+        BluetoothSocket socket;
         byte[] buffer = new byte[100];
         // Keep listening until exception occurs or a socket is returned
         while (mRunning) {
+            socket = null;
             try {
                 if (DEBUG)
                     Log.d(TAG, "Waiting for connection");
