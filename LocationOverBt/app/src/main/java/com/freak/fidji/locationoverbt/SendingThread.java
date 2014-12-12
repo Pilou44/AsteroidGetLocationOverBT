@@ -65,7 +65,6 @@ public class SendingThread extends Thread {
             if (location != null) {
                 if (DEBUG)
                     Log.d(TAG, "Convert location to byte array " + mDevice.getAddress());
-                // https://gist.github.com/jacklt/6711967
                 Parcel parcel = Parcel.obtain();
                 location.writeToParcel(parcel, 0);
                 byte[] bytes = parcel.marshall();
@@ -76,9 +75,9 @@ public class SendingThread extends Thread {
                     mSocket.connect();
                     connected = true;
                 } catch (IOException e) {
-                    if (DEBUG)
-                        Log.d(TAG, "Error while connecting for device " + mDevice.getAddress());
                     connected = false;
+                    Log.e(TAG, "Error while connecting for device " + mDevice.getAddress());
+                    e.printStackTrace();
                 }
 
                 if (connected) {
