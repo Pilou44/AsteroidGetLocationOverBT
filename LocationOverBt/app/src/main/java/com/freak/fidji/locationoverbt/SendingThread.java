@@ -22,7 +22,6 @@ public class SendingThread extends Thread {
     private static final UUID MY_UUID = UUID.fromString("4364cf1a-7621-11e4-b116-123b93f75cba");
     private final BluetoothDevice mDevice;
     private final Context mContext;
-    private BluetoothSocket mSocket;
     private boolean mRunning;
     private SendingThreadListener mListener;
 
@@ -33,18 +32,6 @@ public class SendingThread extends Thread {
         mDevice = device;
         mRunning = false;
         mListener = null;
-
-        if (DEBUG)
-            Log.d(TAG, "Create socket for device " + mDevice.getAddress());
-        BluetoothSocket tmp = null;
-        // Get a BluetoothSocket to connect with the given BluetoothDevice
-        try {
-            // MY_UUID is the app's UUID string, also used by the server code
-            tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mSocket = tmp;
     }
 
     @Override
@@ -57,6 +44,7 @@ public class SendingThread extends Thread {
     @Override
     public void run() {
         boolean connected = false;
+        BluetoothSocket tmp, socket;
         LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
         while (mRunning == true) {
@@ -72,39 +60,50 @@ public class SendingThread extends Thread {
                 byte[] bytes = parcel.marshall();
 
                 if (DEBUG)
-                    Log.d(TAG, "Connect to socket " + mDevice.getAddress());
+                    Log.d(TAG, "Create socket for device " + mDevice.getAddress());
+                tmp = null;
                 try {
-                    mSocket.connect();
-                    connected = true;
+                    tmp = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
                 } catch (IOException e) {
-                    connected = false;
-                    Log.e(TAG, "Error while connecting for device " + mDevice.getAddress());
                     e.printStackTrace();
                 }
+                socket = tmp;
 
-                if (connected) {
+                if (socket != null) {
                     if (DEBUG)
-                        Log.d(TAG, "Send location " + mDevice.getAddress());
+                        Log.d(TAG, "Connect socket " + mDevice.getAddress());
                     try {
-                        DataOutputStream dOut = new DataOutputStream(mSocket.getOutputStream());
-                        dOut.write(bytes, 0, bytes.length);
-                        dOut.flush();
-                        dOut.close();
+                        socket.connect();
+                        connected = true;
                     } catch (IOException e) {
-                        Log.e(TAG, "Error while sending datas for device " + mDevice.getAddress());
+                        connected = false;
+                        Log.e(TAG, "Error while connecting for device " + mDevice.getAddress());
+                        e.printStackTrace();
+                    }
+
+                    if (connected) {
+                        if (DEBUG)
+                            Log.d(TAG, "Send location " + mDevice.getAddress());
+                        try {
+                            DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+                            dOut.write(bytes, 0, bytes.length);
+                            dOut.flush();
+                            dOut.close();
+                        } catch (IOException e) {
+                            Log.e(TAG, "Error while sending datas for device " + mDevice.getAddress());
+                            e.printStackTrace();
+                        }
+                    }
+
+                    try {
+                        if (DEBUG)
+                            Log.d(TAG, "Close socket for device " + mDevice.getAddress());
+                        socket.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error while closing socket " + mDevice.getAddress());
                         e.printStackTrace();
                     }
                 }
-
-                try {
-                    if (DEBUG)
-                        Log.d(TAG, "Close socket for device " + mDevice.getAddress());
-                    mSocket.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "Error while closing socket " + mDevice.getAddress());
-                    e.printStackTrace();
-                }
-
             }
 
             try {
