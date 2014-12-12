@@ -19,7 +19,7 @@ public class SendingThread extends Thread {
 
     private static final  String TAG = "SENDING_THREAD";
     private static final boolean DEBUG = true;
-    private static final UUID mUuid = UUID.fromString("4364cf1a-7621-11e4-b116-123b93f75cba");
+    private static final UUID MY_UUID = UUID.fromString("4364cf1a-7621-11e4-b116-123b93f75cba");
     private final BluetoothDevice mDevice;
     private final Context mContext;
     private BluetoothSocket mSocket;
@@ -40,8 +40,10 @@ public class SendingThread extends Thread {
         // Get a BluetoothSocket to connect with the given BluetoothDevice
         try {
             // MY_UUID is the app's UUID string, also used by the server code
-            tmp = device.createRfcommSocketToServiceRecord(mUuid);
-        } catch (IOException e) { }
+            tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         mSocket = tmp;
     }
 
