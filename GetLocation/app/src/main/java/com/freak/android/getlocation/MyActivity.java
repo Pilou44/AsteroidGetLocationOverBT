@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 public class MyActivity extends Activity {
@@ -16,6 +17,7 @@ public class MyActivity extends Activity {
     public static final String PREFERENCE_NAME = "asteroid_location";
     private TextView mText;
     private Button mButton;
+    private ShareActionProvider mShareActionProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,11 @@ public class MyActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.my, menu);
+        // Locate MenuItem with ShareActionProvider
+        MenuItem item = menu.findItem(R.id.menu_item_share);
+        // Fetch and store ShareActionProvider
+        mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+        sharePosition();
         return true;
     }
 
@@ -46,6 +53,7 @@ public class MyActivity extends Activity {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             refresh();
+            sharePosition();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -67,4 +75,20 @@ public class MyActivity extends Activity {
             }
         });
     }
+
+    public void sharePosition() {
+        Intent shareIntent = null;
+        if (mShareActionProvider != null) {
+            SharedPreferences pref = getSharedPreferences(PREFERENCE_NAME, 0);
+            final Double latitude = Double.longBitsToDouble(pref.getLong("latitude", Double.doubleToLongBits(0.0)));
+            final Double longitude = Double.longBitsToDouble(pref.getLong("longitude", Double.doubleToLongBits(0.0)));
+
+            shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, this.getString(R.string.title));
+            shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, "http://maps.google.com?q=" + latitude + "," + longitude);
+            mShareActionProvider.setShareIntent(shareIntent);
+        }
+    }
+
 }
