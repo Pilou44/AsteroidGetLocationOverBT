@@ -18,6 +18,8 @@ public class ReceiveThread extends Thread {
     private static final int TIMEOUT_IN_SECONDS = 5;
     private static final long TIME_TO_WAIT = 100;
     private static final int MAX_WAITING_LOOPS = TIMEOUT_IN_SECONDS * 1000 / ((int)TIME_TO_WAIT);
+    private static final int CONNECTION_TIMEOUT = 20000;
+    private static final int MAX_CONNECTION_ATTEMPT = 3;
 
     private final Context mContext;
     private final BluetoothServerSocket mServerSocket;
@@ -37,26 +39,34 @@ public class ReceiveThread extends Thread {
         Log.i(TAG, "Run thread");
         BluetoothSocket socket;
         byte[] buffer = new byte[100];
+        int attempt = 0;
         // Keep listening until exception occurs or a socket is returned
         while (mRunning) {
             socket = null;
             try {
                 if (DEBUG)
                     Log.d(TAG, "Waiting for connection");
-                socket = mServerSocket.accept();
+                socket = mServerSocket.accept(CONNECTION_TIMEOUT);
             } catch (IOException e) {
                 Log.e(TAG, "Error while waiting for connection");
                 e.printStackTrace();
-            }
-
-            if (mListener != null){
-                mListener.onClientConnected();
+                attempt++;
+                if (attempt == MAX_CONNECTION_ATTEMPT) {
+                    mRunning = false;
+                    Log.e(TAG, "Too much attempt, stop thread");
+                }
             }
 
             // If a connection was accepted
             if (socket != null) {
                 if (DEBUG)
-                    Log.d(TAG, "Read datas");
+                    Log.d(TAG, "Connected");
+
+                attempt = 0;
+                if (mListener != null){
+                    mListener.onClientConnected();
+                }
+
                 DataInputStream dIn = null;
 
                 if (DEBUG)
