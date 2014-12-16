@@ -26,7 +26,7 @@ public class ManagerService extends IntentService {
         if (DEBUG)
             Log.d(TAG, "Create service, handle intent");
         if (intent != null) {
-            mState = intent.getStringExtra(MyBootReceiver.ACTION_EXTRA);
+            mState = intent.getStringExtra(BtEventsReceiver.ACTION_EXTRA);
             mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
             Intent serviceIntent = new Intent(this, MyService.class);

@@ -2,19 +2,16 @@ package com.freak.fidji.locationoverbt;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
 import android.util.Log;
 
-public class MyBootReceiver extends BroadcastReceiver {
+public class BtEventsReceiver extends BroadcastReceiver {
     public static final String ACTION_EXTRA = "CONNECTION_STATE";
     private static final String TAG = "BOOT_RECEIVER";
     private static final boolean DEBUG = true;
 
-    public MyBootReceiver() {
+    public BtEventsReceiver() {
     }
 
     @Override
