@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 public class MyBootReceiver extends BroadcastReceiver {
+    public static final String ACTION_EXTRA = "CONNECTION_STATE";
     private static final String TAG = "BOOT_RECEIVER";
     private static final boolean DEBUG = true;
 
@@ -23,7 +24,7 @@ public class MyBootReceiver extends BroadcastReceiver {
 
         Intent newIntent = new Intent(context, ManagerService.class);
         newIntent.putExtra(BluetoothDevice.EXTRA_DEVICE, intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE));
-        newIntent.putExtra("CONNEXION_STATE", intent.getAction());
+        newIntent.putExtra(ACTION_EXTRA, intent.getAction());
         context.startService(newIntent);
     }
 
