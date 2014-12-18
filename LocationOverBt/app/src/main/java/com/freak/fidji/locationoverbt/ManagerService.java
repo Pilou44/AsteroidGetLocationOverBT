@@ -35,7 +35,7 @@ public class ManagerService extends IntentService {
             this.startService(serviceIntent);
             if (DEBUG)
                 Log.d(TAG, "Bind service");
-            this.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+            this.bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
         }
     }
 
@@ -46,10 +46,18 @@ public class ManagerService extends IntentService {
 
             MyService myService = ((MyService.LocalBinder)service).getService();
             if (mState.equals(BluetoothDevice.ACTION_ACL_CONNECTED)){
+                if (DEBUG)
+                    Log.d(TAG, "Start thread");
                 myService.startThread(mDevice);
             }
             else if (mState.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)){
+                if (DEBUG)
+                    Log.d(TAG, "Stop thread");
                 myService.stopThread(mDevice);
+            }
+            else {
+                if (DEBUG)
+                    Log.d(TAG, "Unknown action");
             }
             ManagerService.this.unbindService(mConnection);
         }

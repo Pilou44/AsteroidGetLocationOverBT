@@ -8,7 +8,7 @@ import android.util.Log;
 
 public class BtEventsReceiver extends BroadcastReceiver {
     public static final String ACTION_EXTRA = "CONNECTION_STATE";
-    private static final String TAG = "BOOT_RECEIVER";
+    private static final String TAG = "BT_EVENT_RECEIVER";
     private static final boolean DEBUG = true;
 
     public BtEventsReceiver() {
