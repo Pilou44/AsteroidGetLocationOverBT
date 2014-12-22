@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Localisation de votre voiture</string>
+    <string name="unknown_position">Latitude: Inconnue\nLongitude: Inconnue\nPrécision: Inconnue</string>
+    <string name="go_button">Allez !</string>
+    <string name="my_car">Ma voiture</string>
+    <string name="action_refresh">Rafraichir</string>
+    <string name="notif_title">Réception de la position de la voiture…</string>
+    <string name="notif_text">Réception de la localisation de la voiture par bluetooth</string>
+    <string name="share">Partager</string>
+    <string name="title">La voiture est ici :</string>
+    <string name="latitude_value">Latitude : </string>
+    <string name="longitude_value">Longitude : </string>
+    <string name="accuracy_value">Précision : </string>
+
+</resources>

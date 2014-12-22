@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Get Location</string>
+    <string name="app_name">Location of your car</string>
     <string name="unknown_position">Latitude: Unknown\nLongitude: Unknown\nAccuracy: Unknown</string>
-    <string name="go_button">Go !</string>
+    <string name="go_button">Go!</string>
     <string name="my_car">My car</string>
     <string name="action_refresh">Refresh</string>
-    <string name="notif_title">Getting Asteroid location...</string>
-    <string name="notif_text">Receiving your Asteroid location by bluetooth</string>
+    <string name="notif_title">Getting car location…</string>
+    <string name="notif_text">Receiving car location by bluetooth</string>
     <string name="share">Share</string>
-    <string name="title">The car is here</string>
+    <string name="title">The car is here:</string>
+    <string name="latitude_value">Latitude: </string>
+    <string name="longitude_value">Longitude: </string>
+    <string name="accuracy_value">Accuracy: </string>
 
 </resources>

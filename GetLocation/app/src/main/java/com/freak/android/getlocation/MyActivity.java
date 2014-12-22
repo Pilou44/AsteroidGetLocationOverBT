@@ -65,7 +65,7 @@ public class MyActivity extends Activity {
         final Double longitude = Double.longBitsToDouble(pref.getLong("longitude", Double.doubleToLongBits(0.0)));
         final Double accuracy = Double.longBitsToDouble(pref.getLong("accuracy", Double.doubleToLongBits(0.0)));
 
-        mText.setText("Latitude = " + latitude + "\nLongitude = " + longitude + "\nAccuracy = " + accuracy);
+        mText.setText(getText(R.string.latitude_value) + latitude.toString() + "\n" + getText(R.string.longitude_value) + longitude.toString() + "\n" + getText(R.string.accuracy_value) + accuracy.toString());
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
