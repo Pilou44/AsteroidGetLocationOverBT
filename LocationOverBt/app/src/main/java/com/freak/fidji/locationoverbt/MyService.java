@@ -1,5 +1,6 @@
 package com.freak.fidji.locationoverbt;
 
+import android.app.Notification;
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
@@ -18,6 +19,7 @@ public class MyService extends Service implements SendingThreadListener{
 
     private Vector<BluetoothDevice> mConnectedDevices;
     private Vector<SendingThread> mSendingThreads;
+    private boolean atLeastOneDeviceConnected;
 
     public class LocalBinder extends Binder {
         MyService getService() {
@@ -79,6 +81,36 @@ public class MyService extends Service implements SendingThreadListener{
                 mSendingThreads.remove(i);
                 break;
             }
+        }
+        if (mConnectedDevices.size() == 0){
+            if (DEBUG)
+                Log.d(TAG, "No more device");
+
+            if (atLeastOneDeviceConnected) {
+                if (DEBUG)
+                    Log.d(TAG, "Receive thread stopped,make service killable again");
+                stopForeground(true);
+                atLeastOneDeviceConnected = false;
+            }
+        }
+
+    }
+
+    @Override
+    public void onConnected(BluetoothDevice device) {
+        if (!atLeastOneDeviceConnected) {
+            if (DEBUG)
+                Log.d(TAG, "A device has successfully connected, make service not killable");
+            atLeastOneDeviceConnected = true;
+
+
+            Notification notif = new Notification.Builder(this)
+                    .setContentTitle(this.getString(R.string.notif_title))
+                    .setContentText(this.getString(R.string.notif_text))
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .build();
+
+            startForeground(291112, notif);
         }
     }
 }

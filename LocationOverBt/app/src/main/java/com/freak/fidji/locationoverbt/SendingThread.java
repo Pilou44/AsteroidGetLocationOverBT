@@ -17,6 +17,7 @@ public class SendingThread extends Thread {
     private static final  String TAG = "SENDING_THREAD";
     private static final boolean DEBUG = true;
     private static final UUID MY_UUID = UUID.fromString("4364cf1a-7621-11e4-b116-123b93f75cba");
+    private static final int MAX_CONNECTION_ATTEMPT = 6;
     private final BluetoothDevice mDevice;
     private final Context mContext;
     private boolean mRunning;
@@ -41,6 +42,7 @@ public class SendingThread extends Thread {
     @Override
     public void run() {
         boolean connected;
+        int attempt = 0;
         BluetoothSocket tmp, socket;
         LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
@@ -76,9 +78,24 @@ public class SendingThread extends Thread {
                         connected = false;
                         Log.e(TAG, "Error while connecting for device " + mDevice.getAddress());
                         e.printStackTrace();
+
+                        attempt++;
+                        if (attempt == MAX_CONNECTION_ATTEMPT) {
+                            mRunning = false;
+                            Log.e(TAG, "Too much attempt, stop thread");
+                        }
                     }
 
                     if (connected) {
+                        if (DEBUG)
+                            Log.d(TAG, "Connected" + mDevice.getAddress());
+                        if (mListener != null) {
+                            if (DEBUG)
+                                Log.d(TAG, "Inform service that connection is successful" + mDevice.getAddress());
+                            mListener.onConnected(mDevice);
+                        }
+                        attempt = 0;
+
                         if (DEBUG)
                             Log.d(TAG, "Send location " + mDevice.getAddress());
                         try {

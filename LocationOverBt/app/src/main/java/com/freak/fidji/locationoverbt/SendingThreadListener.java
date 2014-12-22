@@ -6,4 +6,5 @@ public interface SendingThreadListener {
 
     public void onThreadFinished(BluetoothDevice device);
 
+    void onConnected(BluetoothDevice mDevice);
 }
