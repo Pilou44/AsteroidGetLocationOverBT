@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Localisation par bluetooth</string>
+    <string name="notif_title">Envoi de la localisation</string>
+    <string name="notif_text">Envoi de la localisation par bluetooth</string>
+
+</resources>
