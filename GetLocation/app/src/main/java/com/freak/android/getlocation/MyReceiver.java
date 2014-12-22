@@ -17,19 +17,27 @@ public class MyReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (DEBUG)
             Log.d(TAG, "Intent received");
-        int state = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, -1);
+        int connectionState = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, -1);
+        int btState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1);
 
-        if (state == BluetoothAdapter.STATE_CONNECTED) {
+        if (connectionState == BluetoothAdapter.STATE_CONNECTED) {
             if (DEBUG)
                 Log.d(TAG, "Connected to BT device");
             Intent newIntent = new Intent(context, MyService.class);
             context.startService(newIntent);
         }
-        else if (state == BluetoothAdapter.STATE_DISCONNECTED) {
+        else if (connectionState == BluetoothAdapter.STATE_DISCONNECTED) {
             if (DEBUG)
                 Log.d(TAG, "Disconnected from BT device");
             Intent newIntent = new Intent(context, MyService.class);
             context.stopService(newIntent);
         }
+        else if (btState == BluetoothAdapter.STATE_OFF) {
+            if (DEBUG)
+                Log.d(TAG, "BT off");
+            Intent newIntent = new Intent(context, MyService.class);
+            context.stopService(newIntent);
+        }
+
     }
 }
