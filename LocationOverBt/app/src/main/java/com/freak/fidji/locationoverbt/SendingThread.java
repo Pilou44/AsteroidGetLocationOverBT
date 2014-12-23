@@ -51,50 +51,51 @@ public class SendingThread extends Thread {
                 Log.d(TAG, "Retrieve location " + mDevice.getAddress());
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-            if (location != null) {
-                if (DEBUG)
-                    Log.d(TAG, "Convert location to byte array " + mDevice.getAddress());
-                Parcel parcel = Parcel.obtain();
-                location.writeToParcel(parcel, 0);
-                byte[] bytes = parcel.marshall();
+            if (DEBUG)
+                Log.d(TAG, "Create socket for device " + mDevice.getAddress());
+            tmp = null;
+            try {
+                tmp = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            socket = tmp;
 
+            if (socket != null) {
                 if (DEBUG)
-                    Log.d(TAG, "Create socket for device " + mDevice.getAddress());
-                tmp = null;
+                    Log.d(TAG, "Connect socket " + mDevice.getAddress());
                 try {
-                    tmp = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
+                    socket.connect();
+                    connected = true;
                 } catch (IOException e) {
+                    connected = false;
+                    Log.e(TAG, "Error while connecting for device " + mDevice.getAddress());
                     e.printStackTrace();
+
+                    attempt++;
+                    if (attempt == MAX_CONNECTION_ATTEMPT) {
+                        mRunning = false;
+                        Log.e(TAG, "Too much attempts, stop thread");
+                    }
                 }
-                socket = tmp;
 
-                if (socket != null) {
+                if (connected) {
                     if (DEBUG)
-                        Log.d(TAG, "Connect socket " + mDevice.getAddress());
-                    try {
-                        socket.connect();
-                        connected = true;
-                    } catch (IOException e) {
-                        connected = false;
-                        Log.e(TAG, "Error while connecting for device " + mDevice.getAddress());
-                        e.printStackTrace();
+                        Log.d(TAG, "Connected" + mDevice.getAddress());
+                    attempt = 0;
 
-                        attempt++;
-                        if (attempt == MAX_CONNECTION_ATTEMPT) {
-                            mRunning = false;
-                            Log.e(TAG, "Too much attempt, stop thread");
-                        }
+                    if (mListener != null) {
+                        if (DEBUG)
+                            Log.d(TAG, "Inform service that connection is successful" + mDevice.getAddress());
+                        mListener.onConnected(mDevice);
                     }
 
-                    if (connected) {
+                    if (location != null) {
                         if (DEBUG)
-                            Log.d(TAG, "Connected" + mDevice.getAddress());
-                        if (mListener != null) {
-                            if (DEBUG)
-                                Log.d(TAG, "Inform service that connection is successful" + mDevice.getAddress());
-                            mListener.onConnected(mDevice);
-                        }
-                        attempt = 0;
+                            Log.d(TAG, "Convert location to byte array " + mDevice.getAddress());
+                        Parcel parcel = Parcel.obtain();
+                        location.writeToParcel(parcel, 0);
+                        byte[] bytes = parcel.marshall();
 
                         if (DEBUG)
                             Log.d(TAG, "Send location " + mDevice.getAddress());
@@ -108,15 +109,15 @@ public class SendingThread extends Thread {
                             e.printStackTrace();
                         }
                     }
-
-                    try {
-                        if (DEBUG)
-                            Log.d(TAG, "Close socket for device " + mDevice.getAddress());
-                        socket.close();
-                    } catch (IOException e) {
-                        Log.e(TAG, "Error while closing socket " + mDevice.getAddress());
-                        e.printStackTrace();
-                    }
+                }
+                
+                try {
+                    if (DEBUG)
+                        Log.d(TAG, "Close socket for device " + mDevice.getAddress());
+                    socket.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "Error while closing socket " + mDevice.getAddress());
+                    e.printStackTrace();
                 }
             }
 
