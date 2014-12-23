@@ -1,6 +1,7 @@
 package com.freak.fidji.locationoverbt;
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
@@ -103,14 +104,11 @@ public class MyService extends Service implements SendingThreadListener{
                 Log.d(TAG, "A device has successfully connected, make service not killable");
             atLeastOneDeviceConnected = true;
 
+            Notification notification = new Notification(R.drawable.ic_launcher, this.getString(R.string.notif_title), System.currentTimeMillis());
+            PendingIntent pi = PendingIntent.getService(this, 0, null, 0);
+            notification.setLatestEventInfo(this, this.getString(R.string.notif_title), this.getString(R.string.notif_text), pi);
 
-            Notification notif = new Notification.Builder(this)
-                    .setContentTitle(this.getString(R.string.notif_title))
-                    .setContentText(this.getString(R.string.notif_text))
-                    .setSmallIcon(R.drawable.ic_launcher)
-                    .build();
-
-            startForeground(291112, notif);
+            startForeground(291112, notification);
         }
     }
 }
