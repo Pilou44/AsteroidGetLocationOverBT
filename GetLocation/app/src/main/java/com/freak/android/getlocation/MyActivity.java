@@ -106,7 +106,9 @@ public class MyActivity extends Activity implements OnMapReadyCallback {
         final Double longitude = Double.longBitsToDouble(pref.getLong("longitude", Double.doubleToLongBits(0.0)));
         final Double accuracy = Double.longBitsToDouble(pref.getLong("accuracy", Double.doubleToLongBits(0.0)));
 
-        mText.setText(getText(R.string.latitude_value) + latitude.toString() + "\n" + getText(R.string.longitude_value) + longitude.toString() + "\n" + getText(R.string.accuracy_value) + accuracy.toString());
+        float accuracyM = ((float)((int)(accuracy * 100))) / 100;
+
+        mText.setText(getText(R.string.latitude_value) + latitude.toString() + getText(R.string.lat_lng_unit) + "\n" + getText(R.string.longitude_value) + longitude.toString() + getText(R.string.lat_lng_unit) + "\n" + getText(R.string.accuracy_value) + accuracyM + getText(R.string.accuracy_unit));
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

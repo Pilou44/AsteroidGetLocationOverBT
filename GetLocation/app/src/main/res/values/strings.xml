@@ -13,5 +13,7 @@
     <string name="latitude_value">Latitude: </string>
     <string name="longitude_value">Longitude: </string>
     <string name="accuracy_value">Accuracy: </string>
+    <string name="accuracy_unit" translatable="false">&#160;m</string>
+    <string name="lat_lng_unit" translatable="false">&#160;°</string>
 
 </resources>
