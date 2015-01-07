@@ -3,8 +3,10 @@ package com.freak.android.getlocation;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,12 +14,23 @@ import android.widget.Button;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
-public class MyActivity extends Activity {
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
+
+public class MyActivity extends Activity implements OnMapReadyCallback {
 
     public static final String PREFERENCE_NAME = "asteroid_location";
     private TextView mText;
     private Button mButton;
     private ShareActionProvider mShareActionProvider;
+    private MapView mMap;
+    private Circle mCircle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,12 +38,40 @@ public class MyActivity extends Activity {
         setContentView(R.layout.activity_my);
         mText = (TextView) findViewById(R.id.text);
         mButton = (Button) findViewById(R.id.go_maps);
+        mMap = (MapView) findViewById(R.id.map);
+
+        mMap.onCreate(savedInstanceState);
     }
 
     @Override
     protected void onResume() {
+        mMap.onResume();
         super.onResume();
         refresh();
+    }
+
+    @Override
+    public void onLowMemory() {
+        mMap.onLowMemory();
+        super.onLowMemory();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mMap.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        mMap.onPause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        mMap.onSaveInstanceState(outState);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -74,10 +115,12 @@ public class MyActivity extends Activity {
                 startActivity(intent);
             }
         });
+
+        mMap.getMapAsync(this);
     }
 
     public void sharePosition() {
-        Intent shareIntent = null;
+        Intent shareIntent;
         if (mShareActionProvider != null) {
             SharedPreferences pref = getSharedPreferences(PREFERENCE_NAME, 0);
             final Double latitude = Double.longBitsToDouble(pref.getLong("latitude", Double.doubleToLongBits(0.0)));
@@ -91,4 +134,28 @@ public class MyActivity extends Activity {
         }
     }
 
+    @Override
+    public void onMapReady(GoogleMap map) {
+        SharedPreferences pref = getSharedPreferences(PREFERENCE_NAME, 0);
+        final Double latitude = Double.longBitsToDouble(pref.getLong("latitude", Double.doubleToLongBits(0.0)));
+        final Double longitude = Double.longBitsToDouble(pref.getLong("longitude", Double.doubleToLongBits(0.0)));
+        final Double accuracy = Double.longBitsToDouble(pref.getLong("accuracy", Double.doubleToLongBits(0.0)));
+
+        LatLng location = new LatLng(latitude, longitude);
+
+        MapsInitializer.initialize(this);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 17));
+
+        if (mCircle != null){
+            mCircle.remove();
+        }
+        CircleOptions circleOptions = new CircleOptions()
+                .center(location)
+                .radius(accuracy) // In meters
+                .strokeWidth(2)
+                .strokeColor(Color.BLUE)
+                .fillColor(0x7F0000FF);
+
+        mCircle = map.addCircle(circleOptions);
+    }
 }
