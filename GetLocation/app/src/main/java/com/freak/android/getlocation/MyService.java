@@ -1,6 +1,7 @@
 package com.freak.android.getlocation;
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
@@ -88,11 +89,19 @@ public class MyService extends Service implements ReceiveThreadListener {
         if (!mAlreadyConnected) {
             if (DEBUG)
                 Log.d(TAG, "First connection successful, make service not killable");
+
+            Intent intent = new Intent(this, MyActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
+            PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
             mAlreadyConnected = true;
             Notification notif = new Notification.Builder(this)
                     .setContentTitle(this.getString(R.string.notif_title))
                     .setContentText(this.getString(R.string.notif_text))
                     .setSmallIcon(R.drawable.ic_launcher)
+                    .setContentIntent(pIntent)
                     .build();
 
             startForeground(291112, notif);
