@@ -98,7 +98,7 @@ public class MyActivity extends Activity implements OnMapReadyCallback {
             return true;
         }
         else if (id == R.id.action_stats) {
-            Intent intent = new Intent("com.freak.android.getlocation.stats");
+            Intent intent = new Intent(this, StatisticsActivity.class);
             startActivity(intent);
             return true;
         }
