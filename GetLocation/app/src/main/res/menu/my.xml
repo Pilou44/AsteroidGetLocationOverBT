@@ -11,4 +11,8 @@
         android:title="@string/action_refresh"
         android:orderInCategory="100"
         android:showAsAction="never" />
+    <item android:id="@+id/action_stats"
+        android:title="@string/action_stats"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
 </menu>

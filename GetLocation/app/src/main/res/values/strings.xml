@@ -6,14 +6,25 @@
     <string name="go_button">Go!</string>
     <string name="my_car">My car</string>
     <string name="action_refresh">Refresh</string>
+    <string name="action_stats">Statistics</string>
     <string name="notif_title">Getting car location…</string>
     <string name="notif_text">Receiving car location by bluetooth</string>
     <string name="share">Share</string>
     <string name="title">The car is here:</string>
-    <string name="latitude_value">Latitude: </string>
-    <string name="longitude_value">Longitude: </string>
-    <string name="accuracy_value">Accuracy: </string>
+    <string name="latitude_value">Latitude:&#160;</string>
+    <string name="longitude_value">Longitude:&#160;</string>
+    <string name="accuracy_value">Accuracy:&#160;</string>
     <string name="accuracy_unit" translatable="false">&#160;m</string>
     <string name="lat_lng_unit" translatable="false">&#160;°</string>
+    <string name="time_unit" translatable="false">&#160;ms</string>
+    <string name="title_activity_statistics" translatable="false">Statistics</string>
+    <string name="thread_abort" translatable="false">Aborted threads:&#160;</string>
+    <string name="connection_timeout" translatable="false">Connection timeouts:&#160;</string>
+    <string name="connection_open" translatable="false">Open connections:&#160;</string>
+    <string name="connection_abort" translatable="false">Aborted connections:&#160;</string>
+    <string name="min_time_to_receive" translatable="false">Minimum time to receive datas:&#160;</string>
+    <string name="max_time_to_receive" translatable="false">Maximum time to receive datas:&#160;</string>
+    <string name="last_time_to_receive" translatable="false">Last time to receive datas:&#160;</string>
+    <string name="corrupted_datas" translatable="false">Corrupted datas:&#160;</string>
 
 </resources>

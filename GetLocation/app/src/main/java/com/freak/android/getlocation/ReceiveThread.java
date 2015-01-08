@@ -16,8 +16,8 @@ public class ReceiveThread extends Thread {
     private static final String TAG = "RECEIVE_THREAD";
     private static final boolean DEBUG = true;
     private static final int TIMEOUT_IN_SECONDS = 5;
-    private static final long TIME_TO_WAIT = 100;
-    private static final int MAX_WAITING_LOOPS = TIMEOUT_IN_SECONDS * 1000 / ((int)TIME_TO_WAIT);
+    private static final int TIME_TO_WAIT = 100;
+    private static final int MAX_WAITING_LOOPS = TIMEOUT_IN_SECONDS * 1000 / TIME_TO_WAIT;
     private static final int CONNECTION_TIMEOUT = 20000;
     private static final int MAX_CONNECTION_ATTEMPT = 3;
 
@@ -37,6 +37,21 @@ public class ReceiveThread extends Thread {
     @Override
     public void run() {
         Log.i(TAG, "Run thread");
+
+        SharedPreferences pref = mContext.getSharedPreferences(MyActivity.PREFERENCE_NAME, 0);
+        SharedPreferences.Editor editor = pref.edit();
+
+        if (DEBUG)
+            Log.d(TAG, "Load statistics");
+        int connectionTimeout = pref.getInt("connection_timeout", 0);
+        int connectionAbort = pref.getInt("connection_abort", 0);
+        int connectionOpen = pref.getInt("connection_open", 0);
+        int threadAbort = pref.getInt("thread_abort", 0);
+        int minTimeToReceive = pref.getInt("min_time", TIMEOUT_IN_SECONDS * 1000);
+        int maxTimeToReceive = pref.getInt("max_time", 0);
+        int lastTimeToReceive;
+        int corruptedDatas = pref.getInt("corrupted_datas", 0);
+
         BluetoothSocket socket;
         byte[] buffer = new byte[100];
         int attempt = 0;
@@ -51,8 +66,14 @@ public class ReceiveThread extends Thread {
                 Log.e(TAG, "Error while waiting for connection");
                 e.printStackTrace();
                 attempt++;
+                connectionTimeout++;
+                editor.putInt("connection_timeout", connectionTimeout);
+                editor.apply();
                 if (attempt == MAX_CONNECTION_ATTEMPT) {
                     mRunning = false;
+                    threadAbort++;
+                    editor.putInt("thread_abort", threadAbort);
+                    editor.apply();
                     Log.e(TAG, "Too much attempt, stop thread");
                 }
             }
@@ -61,6 +82,9 @@ public class ReceiveThread extends Thread {
             if (socket != null) {
                 if (DEBUG)
                     Log.d(TAG, "Connected");
+                connectionOpen++;
+                editor.putInt("connection_open", connectionOpen);
+                editor.apply();
 
                 attempt = 0;
                 if (mListener != null){
@@ -96,6 +120,18 @@ public class ReceiveThread extends Thread {
 
                     if (loop < MAX_WAITING_LOOPS) {
                         int index = 0;
+
+                        lastTimeToReceive = loop * TIME_TO_WAIT;
+                        if (lastTimeToReceive < minTimeToReceive)
+                            minTimeToReceive = lastTimeToReceive;
+                        if (lastTimeToReceive > maxTimeToReceive)
+                            maxTimeToReceive = lastTimeToReceive;
+
+                        editor.putInt("min_time", minTimeToReceive);
+                        editor.putInt("max_time", maxTimeToReceive);
+                        editor.putInt("last_time", lastTimeToReceive);
+                        editor.apply();
+
                         try {
                             if (DEBUG)
                                 Log.d(TAG, "Read datas");
@@ -115,18 +151,22 @@ public class ReceiveThread extends Thread {
 
                             if (DEBUG)
                                 Log.d(TAG, "Store location");
-                            SharedPreferences pref = mContext.getSharedPreferences(MyActivity.PREFERENCE_NAME, 0);
-                            SharedPreferences.Editor editor = pref.edit();
                             editor.putLong("latitude", Double.doubleToRawLongBits(location.getLatitude()));
                             editor.putLong("longitude", Double.doubleToRawLongBits(location.getLongitude()));
                             editor.putLong("accuracy", Double.doubleToRawLongBits(location.getAccuracy()));
                             editor.apply();
                         } catch (IOException e) {
                             e.printStackTrace();
+                            corruptedDatas++;
+                            editor.putInt("corrupted_datas", corruptedDatas);
+                            editor.apply();
                         }
                     }
                     else {
                         Log.e(TAG, "Too much waiting loops");
+                        connectionAbort++;
+                        editor.putInt("connection_abort", connectionAbort);
+                        editor.apply();
                     }
                 }
 
@@ -149,6 +189,7 @@ public class ReceiveThread extends Thread {
             Log.e(TAG, "Error while closing server socket");
             e.printStackTrace();
         }
+
         Log.i(TAG, "End of thread");
         if (mListener != null){
             mListener.onThreadFinished();

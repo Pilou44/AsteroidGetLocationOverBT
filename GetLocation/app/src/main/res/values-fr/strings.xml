@@ -6,6 +6,7 @@
     <string name="go_button">Allez !</string>
     <string name="my_car">Ma voiture</string>
     <string name="action_refresh">Rafraichir</string>
+    <string name="action_stats">Statistiques</string>
     <string name="notif_title">Réception de la position de la voiture…</string>
     <string name="notif_text">Réception de la localisation de la voiture par bluetooth</string>
     <string name="share">Partager</string>
