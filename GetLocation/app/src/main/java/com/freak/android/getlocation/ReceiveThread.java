@@ -15,7 +15,7 @@ public class ReceiveThread extends Thread {
 
     private static final String TAG = "RECEIVE_THREAD";
     private static final boolean DEBUG = true;
-    private static final int TIMEOUT_IN_SECONDS = 5;
+    private static final int TIMEOUT_IN_SECONDS = 8;
     private static final int TIME_TO_WAIT = 100;
     private static final int MAX_WAITING_LOOPS = TIMEOUT_IN_SECONDS * 1000 / TIME_TO_WAIT;
     private static final int CONNECTION_TIMEOUT = 20000;
