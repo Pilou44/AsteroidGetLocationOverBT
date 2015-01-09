@@ -86,7 +86,7 @@ public class SendingThread extends Thread {
 
                     if (mListener != null) {
                         if (DEBUG)
-                            Log.d(TAG, "Inform service that connection is successful" + mDevice.getAddress());
+                            Log.d(TAG, "Inform service that connection is successful for device " + mDevice.getAddress());
                         mListener.onConnected(mDevice);
                     }
 
@@ -108,6 +108,10 @@ public class SendingThread extends Thread {
                             Log.e(TAG, "Error while sending datas for device " + mDevice.getAddress());
                             e.printStackTrace();
                         }
+                    }
+                    else {
+                        if (DEBUG)
+                            Log.d(TAG, "No location to send to " + mDevice.getAddress());
                     }
                 }
                 
