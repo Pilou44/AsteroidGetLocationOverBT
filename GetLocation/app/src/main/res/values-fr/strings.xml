@@ -14,5 +14,13 @@
     <string name="latitude_value">Latitude :&#160;</string>
     <string name="longitude_value">Longitude :&#160;</string>
     <string name="accuracy_value">Précision :&#160;</string>
+    <string name="thread_abort">Tâches abandonnées :&#160;</string>
+    <string name="connection_timeout">Dépassements de délai de connection :&#160;</string>
+    <string name="connection_open">Connections ouvertes :&#160;</string>
+    <string name="connection_abort">Connections sans données reçues :&#160;</string>
+    <string name="min_time_to_receive">Temps minimum de réception de données :&#160;</string>
+    <string name="max_time_to_receive">Temps maximum de réception de données :&#160;</string>
+    <string name="last_time_to_receive">Durée de la dernière réception des données :&#160;</string>
+    <string name="corrupted_datas">Données corrompues :&#160;</string>
 
 </resources>
