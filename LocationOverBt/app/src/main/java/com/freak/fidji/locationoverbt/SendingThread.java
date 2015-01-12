@@ -18,6 +18,7 @@ public class SendingThread extends Thread {
     private static final boolean DEBUG = true;
     private static final UUID MY_UUID = UUID.fromString("4364cf1a-7621-11e4-b116-123b93f75cba");
     private static final int MAX_CONNECTION_ATTEMPT = 6;
+    private static final long TIME_BETWEEN_TO_SENDS = 15000;
     private final BluetoothDevice mDevice;
     private final Context mContext;
     private boolean mRunning;
@@ -90,28 +91,32 @@ public class SendingThread extends Thread {
                         mListener.onConnected(mDevice);
                     }
 
+                    byte[] bytes;
                     if (location != null) {
                         if (DEBUG)
                             Log.d(TAG, "Convert location to byte array " + mDevice.getAddress());
                         Parcel parcel = Parcel.obtain();
                         location.writeToParcel(parcel, 0);
-                        byte[] bytes = parcel.marshall();
+                        bytes = parcel.marshall();
 
-                        if (DEBUG)
-                            Log.d(TAG, "Send location " + mDevice.getAddress());
-                        try {
-                            DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
-                            dOut.write(bytes, 0, bytes.length);
-                            dOut.flush();
-                            dOut.close();
-                        } catch (IOException e) {
-                            Log.e(TAG, "Error while sending datas for device " + mDevice.getAddress());
-                            e.printStackTrace();
-                        }
                     }
                     else {
                         if (DEBUG)
                             Log.d(TAG, "No location to send to " + mDevice.getAddress());
+                        String string  = "No datas";
+                        bytes = string.getBytes();
+                    }
+
+                    if (DEBUG)
+                        Log.d(TAG, "Send datas " + mDevice.getAddress());
+                    try {
+                        DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+                        dOut.write(bytes, 0, bytes.length);
+                        dOut.flush();
+                        dOut.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error while sending datas for device " + mDevice.getAddress());
+                        e.printStackTrace();
                     }
                 }
                 
@@ -127,8 +132,8 @@ public class SendingThread extends Thread {
 
             try {
                 if (DEBUG)
-                    Log.d(TAG, "Sleep 10s for device " + mDevice.getAddress());
-                Thread.sleep(10000);
+                    Log.d(TAG, "Sleep " + (TIME_BETWEEN_TO_SENDS / 1000) + " s for device " + mDevice.getAddress());
+                Thread.sleep(TIME_BETWEEN_TO_SENDS);
             } catch (Exception e) {
                 e.printStackTrace();
             }
