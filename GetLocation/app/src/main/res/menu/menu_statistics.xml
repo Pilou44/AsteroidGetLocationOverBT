@@ -3,4 +3,6 @@
     tools:context="com.freak.android.getlocation.StatisticsActivity">
     <item android:id="@+id/action_refresh" android:title="@string/action_refresh"
         android:orderInCategory="100" android:showAsAction="never" />
+    <item android:id="@+id/action_clear" android:title="@string/action_clear"
+        android:orderInCategory="100" android:showAsAction="never" />
 </menu>

@@ -15,7 +15,7 @@ public class ReceiveThread extends Thread {
 
     private static final String TAG = "RECEIVE_THREAD";
     private static final boolean DEBUG = true;
-    private static final int TIMEOUT_IN_SECONDS = 8;
+    public static final int TIMEOUT_IN_SECONDS = 8;
     private static final int TIME_TO_WAIT = 100;
     private static final int MAX_WAITING_LOOPS = TIMEOUT_IN_SECONDS * 1000 / TIME_TO_WAIT;
     private static final int CONNECTION_TIMEOUT = 20000;
@@ -45,6 +45,8 @@ public class ReceiveThread extends Thread {
             Log.d(TAG, "Load statistics");
         int connectionTimeout = pref.getInt("connection_timeout", 0);
         int connectionAbort = pref.getInt("connection_abort", 0);
+        int receivedMessages = pref.getInt("received_messages", 0);
+        int receivedLocations = pref.getInt("received_locations", 0);
         int connectionOpen = pref.getInt("connection_open", 0);
         int threadAbort = pref.getInt("thread_abort", 0);
         int minTimeToReceive = pref.getInt("min_time", TIMEOUT_IN_SECONDS * 1000);
@@ -141,25 +143,39 @@ public class ReceiveThread extends Thread {
                             }
                             if (DEBUG)
                                 Log.d(TAG, index + " bytes read");
-
-                            if (DEBUG)
-                                Log.d(TAG, "Convert to Location");
-                            Parcel parcel = Parcel.obtain();
-                            parcel.unmarshall(buffer, 0, index);
-                            parcel.setDataPosition(0); // this is extremely important!
-                            Location location = Location.CREATOR.createFromParcel(parcel);
-
-                            if (DEBUG)
-                                Log.d(TAG, "Store location");
-                            editor.putLong("latitude", Double.doubleToRawLongBits(location.getLatitude()));
-                            editor.putLong("longitude", Double.doubleToRawLongBits(location.getLongitude()));
-                            editor.putLong("accuracy", Double.doubleToRawLongBits(location.getAccuracy()));
-                            editor.apply();
                         } catch (IOException e) {
                             e.printStackTrace();
                             corruptedDatas++;
                             editor.putInt("corrupted_datas", corruptedDatas);
                             editor.apply();
+                        }
+
+                        if (index > 0) {
+                            try {
+                                if (DEBUG)
+                                    Log.d(TAG, "Convert to Location");
+                                Parcel parcel = Parcel.obtain();
+                                parcel.unmarshall(buffer, 0, index);
+                                parcel.setDataPosition(0); // this is extremely important!
+                                Location location = Location.CREATOR.createFromParcel(parcel);
+
+                                if (DEBUG)
+                                    Log.d(TAG, "Store location");
+                                editor.putLong("latitude", Double.doubleToRawLongBits(location.getLatitude()));
+                                editor.putLong("longitude", Double.doubleToRawLongBits(location.getLongitude()));
+                                editor.putLong("accuracy", Double.doubleToRawLongBits(location.getAccuracy()));
+                                receivedLocations++;
+                                editor.putInt("received_locations", receivedLocations);
+                                editor.apply();
+                            } catch (Exception e) { // TODO Get the correct exception when text is received
+                                e.printStackTrace();
+                                String string = new String (buffer, 0, index);
+                                receivedMessages++;
+                                editor.putInt("received_messages", receivedMessages);
+                                editor.apply();
+                                if (DEBUG)
+                                    Log.d(TAG, "Received message = " + string);
+                            }
                         }
                     }
                     else {

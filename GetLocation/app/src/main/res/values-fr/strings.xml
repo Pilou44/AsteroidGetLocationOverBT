@@ -7,6 +7,7 @@
     <string name="my_car">Ma voiture</string>
     <string name="action_refresh">Rafraichir</string>
     <string name="action_stats">Statistiques</string>
+    <string name="action_clear">Effacer les statistiques</string>
     <string name="notif_title">Réception de la position de la voiture…</string>
     <string name="notif_text">Réception de la localisation de la voiture par bluetooth</string>
     <string name="share">Partager</string>
@@ -22,5 +23,7 @@
     <string name="max_time_to_receive">Temps maximum de réception de données :&#160;</string>
     <string name="last_time_to_receive">Durée de la dernière réception des données :&#160;</string>
     <string name="corrupted_datas">Données corrompues :&#160;</string>
+    <string name="received_locations">Positions reçues :&#160;</string>
+    <string name="received_messages">Messages reçus :&#160;</string>
 
 </resources>
