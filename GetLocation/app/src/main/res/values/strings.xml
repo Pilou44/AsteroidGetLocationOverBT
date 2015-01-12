@@ -4,6 +4,16 @@
     <string name="accuracy_unit" translatable="false">&#160;m</string>
     <string name="lat_lng_unit" translatable="false">°</string>
     <string name="time_unit" translatable="false">&#160;ms</string>
+    <string name="key_connection_timeout" translatable="false">connection_timeout</string>
+    <string name="key_connection_abort" translatable="false">connection_abort</string>
+    <string name="key_received_messages" translatable="false">received_messages</string>
+    <string name="key_received_locations" translatable="false">received_locations</string>
+    <string name="key_connection_open" translatable="false">connection_open</string>
+    <string name="key_thread_abort" translatable="false">thread_abort</string>
+    <string name="key_min_time" translatable="false">min_time</string>
+    <string name="key_max_time" translatable="false">max_time</string>
+    <string name="key_last_time" translatable="false">last_time</string>
+    <string name="key_corrupted_datas" translatable="false">corrupted_datas</string>
 
     <string name="app_name">Location of your car</string>
     <string name="unknown_position">Latitude: Unknown\nLongitude: Unknown\nAccuracy: Unknown</string>

@@ -52,32 +52,32 @@ public class StatisticsActivity extends Activity {
         SharedPreferences pref = this.getSharedPreferences(MyActivity.PREFERENCE_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
 
-        editor.putInt("connection_timeout", 0);
-        editor.putInt("connection_abort", 0);
-        editor.putInt("received_messages", 0);
-        editor.putInt("received_locations", 0);
-        editor.putInt("connection_open", 0);
-        editor.putInt("thread_abort", 0);
-        editor.putInt("min_time", ReceiveThread.TIMEOUT_IN_SECONDS * 1000);
-        editor.putInt("max_time", 0);
-        editor.putInt("last_time", 0);
-        editor.putInt("corrupted_datas", 0);
+        editor.putInt(getString(R.string.key_connection_timeout), 0);
+        editor.putInt(getString(R.string.key_connection_abort), 0);
+        editor.putInt(getString(R.string.key_received_messages), 0);
+        editor.putInt(getString(R.string.key_received_locations), 0);
+        editor.putInt(getString(R.string.key_connection_open), 0);
+        editor.putInt(getString(R.string.key_thread_abort), 0);
+        editor.putInt(getString(R.string.key_min_time), ReceiveThread.TIMEOUT_IN_SECONDS * 1000);
+        editor.putInt(getString(R.string.key_max_time), 0);
+        editor.putInt(getString(R.string.key_last_time), 0);
+        editor.putInt(getString(R.string.key_corrupted_datas), 0);
         editor.apply();
     }
 
     private void refresh() {
 
         SharedPreferences pref = getSharedPreferences(MyActivity.PREFERENCE_NAME, 0);
-        int connectionTimeout = pref.getInt("connection_timeout", 0);
-        int connectionAbort = pref.getInt("connection_abort", 0);
-        int receivedMessages = pref.getInt("received_messages", 0);
-        int receivedLocations = pref.getInt("received_locations", 0);
-        int connectionOpen = pref.getInt("connection_open", 0);
-        int threadAbort = pref.getInt("thread_abort", 0);
-        int minTimeToReceive = pref.getInt("min_time", 0);
-        int maxTimeToReceive = pref.getInt("max_time", 0);
-        int lastTimeToReceive = pref.getInt("last_time", 0);
-        int corruptedDatas = pref.getInt("corrupted_datas", 0);
+        int connectionTimeout = pref.getInt(getString(R.string.key_connection_timeout), 0);
+        int connectionAbort = pref.getInt(getString(R.string.key_connection_abort), 0);
+        int receivedMessages = pref.getInt(getString(R.string.key_received_messages), 0);
+        int receivedLocations = pref.getInt(getString(R.string.key_received_locations), 0);
+        int connectionOpen = pref.getInt(getString(R.string.key_connection_open), 0);
+        int threadAbort = pref.getInt(getString(R.string.key_thread_abort), 0);
+        int minTimeToReceive = pref.getInt(getString(R.string.key_min_time), 0);
+        int maxTimeToReceive = pref.getInt(getString(R.string.key_max_time), 0);
+        int lastTimeToReceive = pref.getInt(getString(R.string.key_last_time), 0);
+        int corruptedDatas = pref.getInt(getString(R.string.key_corrupted_datas), 0);
 
         mText.setText("" +
                 getText(R.string.thread_abort) + threadAbort + "\n" +
