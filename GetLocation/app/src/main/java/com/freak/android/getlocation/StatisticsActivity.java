@@ -42,6 +42,7 @@ public class StatisticsActivity extends Activity {
         }
         else if (id == R.id.action_clear) {
             clear();
+            refresh();
             return true;
         }
 
