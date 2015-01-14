@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Location Over bluetooth</string>
+    <string name="notif_title">Sending car location</string>
+    <string name="notif_text">Sending car location over bluetooth</string>
+
+</resources>
