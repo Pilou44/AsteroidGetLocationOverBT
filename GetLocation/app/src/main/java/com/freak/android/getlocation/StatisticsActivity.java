@@ -59,7 +59,7 @@ public class StatisticsActivity extends Activity {
         editor.putInt(getString(R.string.key_received_locations), 0);
         editor.putInt(getString(R.string.key_connection_open), 0);
         editor.putInt(getString(R.string.key_thread_abort), 0);
-        editor.putInt(getString(R.string.key_min_time), ReceiveThread.TIMEOUT_IN_SECONDS * 1000);
+        editor.putInt(getString(R.string.key_min_time), Integer.MAX_VALUE);
         editor.putInt(getString(R.string.key_max_time), 0);
         editor.putInt(getString(R.string.key_last_time), 0);
         editor.putInt(getString(R.string.key_corrupted_datas), 0);

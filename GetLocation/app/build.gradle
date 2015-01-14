@@ -8,8 +8,8 @@ android {
         applicationId "com.freak.android.getlocation"
         minSdkVersion 16
         targetSdkVersion 20
-        versionCode 3
-        versionName "1.2"
+        versionCode 20
+        versionName "2.0"
     }
     buildTypes {
         release {

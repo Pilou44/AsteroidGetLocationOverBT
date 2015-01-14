@@ -10,16 +10,13 @@ import android.util.Log;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.GregorianCalendar;
 
 public class ReceiveThread extends Thread {
 
     private static final String TAG = "RECEIVE_THREAD";
     private static final boolean DEBUG = true;
-    public static final int TIMEOUT_IN_SECONDS = 8;
-    private static final int TIME_TO_WAIT = 100;
-    private static final int MAX_WAITING_LOOPS = TIMEOUT_IN_SECONDS * 1000 / TIME_TO_WAIT;
-    private static final int CONNECTION_TIMEOUT = 20000;
-    private static final int MAX_CONNECTION_ATTEMPT = 3;
+    private static final int CONNECTION_TIMEOUT = 120000;
 
     private final Context mContext;
     private final BluetoothServerSocket mServerSocket;
@@ -42,170 +39,118 @@ public class ReceiveThread extends Thread {
         SharedPreferences.Editor editor = pref.edit();
 
         int connectionTimeout;
-        int connectionAbort;
-        int receivedMessages;
         int receivedLocations;
-        int connectionOpen;
-        int threadAbort;
         int minTimeToReceive;
         int maxTimeToReceive;
-        int lastTimeToReceive;
-        int corruptedDatas;
 
-        BluetoothSocket socket;
+        int nbBytes = -1;
+
+        BluetoothSocket socket = null;
         byte[] buffer = new byte[100];
-        int attempt = 0;
-        // Keep listening until exception occurs or a socket is returned
-        while (mRunning) {
-            socket = null;
-            try {
-                if (DEBUG)
-                    Log.d(TAG, "Waiting for connection");
-                socket = mServerSocket.accept(CONNECTION_TIMEOUT);
-            } catch (IOException e) {
-                Log.e(TAG, "Error while waiting for connection");
-                e.printStackTrace();
-                attempt++;
-                connectionTimeout = pref.getInt(mContext.getString(R.string.key_connection_timeout), 0);
-                connectionTimeout++;
-                editor.putInt(mContext.getString(R.string.key_connection_timeout), connectionTimeout);
-                editor.apply();
-                if (attempt == MAX_CONNECTION_ATTEMPT) {
-                    mRunning = false;
-                    threadAbort = pref.getInt(mContext.getString(R.string.key_thread_abort), 0);
-                    threadAbort++;
-                    editor.putInt(mContext.getString(R.string.key_thread_abort), threadAbort);
-                    editor.apply();
-                    Log.e(TAG, "Too much attempt, stop thread");
-                }
+
+        try {
+            if (DEBUG)
+                Log.d(TAG, "Waiting for connection");
+            socket = mServerSocket.accept(CONNECTION_TIMEOUT);
+        } catch (IOException e) {
+            Log.e(TAG, "No connection for " + (CONNECTION_TIMEOUT/1000) + " s, aborting");
+            e.printStackTrace();
+            connectionTimeout = pref.getInt(mContext.getString(R.string.key_connection_timeout), 0);
+            connectionTimeout++;
+            editor.putInt(mContext.getString(R.string.key_connection_timeout), connectionTimeout);
+            editor.apply();
+            mRunning = false;
+        }
+
+
+
+        // If a connection was accepted
+        if (socket != null) {
+            if (DEBUG)
+                Log.d(TAG, "Connected");
+
+            if (mListener != null){
+                mListener.onClientConnected();
             }
 
-            // If a connection was accepted
-            if (socket != null) {
-                if (DEBUG)
-                    Log.d(TAG, "Connected");
-                connectionOpen = pref.getInt(mContext.getString(R.string.key_connection_open), 0);
-                connectionOpen++;
-                editor.putInt(mContext.getString(R.string.key_connection_open), connectionOpen);
-                editor.apply();
+            DataInputStream dIn = null;
+            if (DEBUG)
+                Log.d(TAG, "Create input reader");
+            try {
+                dIn = new DataInputStream(socket.getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+                mRunning = false;
+            }
 
-                attempt = 0;
-                if (mListener != null){
-                    mListener.onClientConnected();
-                }
-
-                DataInputStream dIn = null;
-
-                if (DEBUG)
-                    Log.d(TAG, "Create input reader");
-                try {
-                    dIn = new DataInputStream(socket.getInputStream());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                if (dIn != null) {
-                    int loop = 0;
-                    try {
-                        while ((dIn.available() == 0) && (loop < MAX_WAITING_LOOPS)) {
-                            if (DEBUG)
-                                Log.d(TAG, "Wait for datas, loop number " + loop);
-                            Thread.sleep(TIME_TO_WAIT);
-                            loop++;
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        loop = MAX_WAITING_LOOPS;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        loop = MAX_WAITING_LOOPS;
-                    }
-
-                    if (loop < MAX_WAITING_LOOPS) {
-                        int index = 0;
-
-                        minTimeToReceive = pref.getInt(mContext.getString(R.string.key_min_time), TIMEOUT_IN_SECONDS * 1000);
-                        maxTimeToReceive = pref.getInt(mContext.getString(R.string.key_max_time), 0);
-                        lastTimeToReceive = loop * TIME_TO_WAIT;
-                        if (lastTimeToReceive < minTimeToReceive) {
-                            minTimeToReceive = lastTimeToReceive;
-                            editor.putInt(mContext.getString(R.string.key_min_time), minTimeToReceive);
-                        }
-                        if (lastTimeToReceive > maxTimeToReceive) {
-                            maxTimeToReceive = lastTimeToReceive;
-                            editor.putInt(mContext.getString(R.string.key_max_time), maxTimeToReceive);
-                        }
-
-                        editor.putInt(mContext.getString(R.string.key_last_time), lastTimeToReceive);
-                        editor.apply();
-
-                        try {
-                            if (DEBUG)
-                                Log.d(TAG, "Read datas");
-                            while (dIn.available() > 0) {
-                                buffer[index] = dIn.readByte();
-                                index++;
-                            }
-                            if (DEBUG)
-                                Log.d(TAG, index + " bytes read");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            corruptedDatas = pref.getInt(mContext.getString(R.string.key_corrupted_datas), 0);
-                            corruptedDatas++;
-                            editor.putInt(mContext.getString(R.string.key_corrupted_datas), corruptedDatas);
-                            editor.apply();
-                        }
-
-                        if (index > 0) {
-                            try {
-                                if (DEBUG)
-                                    Log.d(TAG, "Convert to Location");
-                                Parcel parcel = Parcel.obtain();
-                                parcel.unmarshall(buffer, 0, index);
-                                parcel.setDataPosition(0); // this is extremely important!
-                                Location location = Location.CREATOR.createFromParcel(parcel);
-
-                                if (DEBUG)
-                                    Log.d(TAG, "Store location");
-                                editor.putLong("latitude", Double.doubleToRawLongBits(location.getLatitude()));
-                                editor.putLong("longitude", Double.doubleToRawLongBits(location.getLongitude()));
-                                editor.putLong("accuracy", Double.doubleToRawLongBits(location.getAccuracy()));
-                                receivedLocations = pref.getInt(mContext.getString(R.string.key_received_locations), 0);
-                                receivedLocations++;
-                                editor.putInt(mContext.getString(R.string.key_received_locations), receivedLocations);
-                                editor.apply();
-                            } catch (Exception e) { // TODO Get the correct exception when text is received
-                                e.printStackTrace();
-                                String string = new String (buffer, 0, index);
-                                receivedMessages = pref.getInt(mContext.getString(R.string.key_received_messages), 0);
-                                receivedMessages++;
-                                editor.putInt(mContext.getString(R.string.key_received_messages), receivedMessages);
-                                editor.apply();
-                                if (DEBUG)
-                                    Log.d(TAG, "Received message = " + string);
-                            }
-                        }
-                    }
-                    else {
-                        Log.e(TAG, "Too much waiting loops");
-                        connectionAbort = pref.getInt(mContext.getString(R.string.key_connection_abort), 0);
-                        connectionAbort++;
-                        editor.putInt(mContext.getString(R.string.key_connection_abort), connectionAbort);
-                        editor.apply();
-                    }
-                }
-
+            long lastTime = 0;
+            while (mRunning) {
                 try {
                     if (DEBUG)
-                        Log.d(TAG, "All done, close client socket");
-                    socket.close();
+                        Log.d(TAG, "Read datas");
+                    nbBytes = dIn.read(buffer);
+                    if (DEBUG)
+                        Log.d(TAG, nbBytes + " bytes read");
                 } catch (IOException e) {
-                    Log.e(TAG, "Error while closing client socket");
                     e.printStackTrace();
                 }
 
+                if (nbBytes > 0) {
+                    if (DEBUG)
+                        Log.d(TAG, "Calculate time between two receptions");
+                    long currentTime = new GregorianCalendar().getTimeInMillis();
+                    if (lastTime > 0) {
+                        int timeToReceive = (int)(currentTime - lastTime);
+                        minTimeToReceive = pref.getInt(mContext.getString(R.string.key_min_time), Integer.MAX_VALUE);
+                        maxTimeToReceive = pref.getInt(mContext.getString(R.string.key_max_time), 0);
+                        if (timeToReceive < minTimeToReceive) {
+                            minTimeToReceive = timeToReceive;
+                            editor.putInt(mContext.getString(R.string.key_min_time), minTimeToReceive);
+                        }
+                        if (timeToReceive > maxTimeToReceive) {
+                            maxTimeToReceive = timeToReceive;
+                            editor.putInt(mContext.getString(R.string.key_max_time), maxTimeToReceive);
+                        }
+                        editor.putInt(mContext.getString(R.string.key_last_time), timeToReceive);
+                        editor.apply();
+                    }
+                    lastTime = currentTime;
+
+                    if (DEBUG)
+                        Log.d(TAG, "Convert to Location");
+                    Parcel parcel = Parcel.obtain();
+                    parcel.unmarshall(buffer, 0, nbBytes);
+                    parcel.setDataPosition(0); // this is extremely important!
+                    Location location = Location.CREATOR.createFromParcel(parcel);
+
+                    if (DEBUG)
+                        Log.d(TAG, "Store location");
+                    editor.putLong("latitude", Double.doubleToRawLongBits(location.getLatitude()));
+                    editor.putLong("longitude", Double.doubleToRawLongBits(location.getLongitude()));
+                    editor.putLong("accuracy", Double.doubleToRawLongBits(location.getAccuracy()));
+                    receivedLocations = pref.getInt(mContext.getString(R.string.key_received_locations), 0);
+                    receivedLocations++;
+                    editor.putInt(mContext.getString(R.string.key_received_locations), receivedLocations);
+                    editor.apply();
+                }
+                else {
+                    if (DEBUG)
+                        Log.d(TAG, "No data to read");
+                }
+
+            } // while (mRunning)
+
+            try {
+                if (DEBUG)
+                    Log.d(TAG, "All done, close client socket");
+                socket.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Error while closing client socket");
+                e.printStackTrace();
             }
-        }
+
+        } // if (socket != null)
+
         try {
             if (DEBUG)
                 Log.d(TAG, "All done, close server socket");
