@@ -79,6 +79,17 @@ public class SendingThread extends Thread {
                 e.printStackTrace();
             }
 
+            if (DEBUG)
+                Log.d(TAG, "Open output stream " + mDevice.getAddress());
+            DataOutputStream dOut = null;
+            try {
+                dOut = new DataOutputStream(socket.getOutputStream());
+            } catch (IOException e) {
+                Log.e(TAG, "Error while opening output stream " + mDevice.getAddress());
+                e.printStackTrace();
+                mRunning = false;
+            }
+
             while (mRunning) {
                 if (DEBUG)
                     Log.d(TAG, "Retrieve location " + mDevice.getAddress());
@@ -94,10 +105,8 @@ public class SendingThread extends Thread {
                     if (DEBUG)
                         Log.d(TAG, "Send datas " + mDevice.getAddress());
                     try {
-                        DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
                         dOut.write(bytes, 0, bytes.length);
                         dOut.flush();
-                        dOut.close();
                     } catch (IOException e) {
                         Log.e(TAG, "Error while sending datas for device " + mDevice.getAddress());
                         e.printStackTrace();
@@ -119,7 +128,9 @@ public class SendingThread extends Thread {
 
             try {
                 if (DEBUG)
-                    Log.d(TAG, "Close socket for device " + mDevice.getAddress());
+                    Log.d(TAG, "Close output stream and socket for device " + mDevice.getAddress());
+                if (dOut != null)
+                    dOut.close();
                 socket.close();
             } catch (IOException e) {
                 Log.e(TAG, "Error while closing socket " + mDevice.getAddress());
