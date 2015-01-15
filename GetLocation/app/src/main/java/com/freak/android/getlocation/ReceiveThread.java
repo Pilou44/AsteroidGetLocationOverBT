@@ -17,6 +17,7 @@ public class ReceiveThread extends Thread {
     private static final String TAG = "RECEIVE_THREAD";
     private static final boolean DEBUG = true;
     private static final int CONNECTION_TIMEOUT = 120000;
+    private static final long SLEEP_TIME = 100;
 
     private final Context mContext;
     private final BluetoothServerSocket mServerSocket;
@@ -43,7 +44,7 @@ public class ReceiveThread extends Thread {
         int minTimeToReceive;
         int maxTimeToReceive;
 
-        int nbBytes = -1;
+        int nbBytes;
 
         BluetoothSocket socket = null;
         byte[] buffer = new byte[100];
@@ -89,11 +90,13 @@ public class ReceiveThread extends Thread {
                     if (DEBUG)
                         Log.d(TAG, "Read datas");
                     nbBytes = dIn.read(buffer);
-                    if (DEBUG)
-                        Log.d(TAG, nbBytes + " bytes read");
                 } catch (IOException e) {
                     e.printStackTrace();
+                    nbBytes = 0;
                 }
+
+                if (DEBUG)
+                    Log.d(TAG, nbBytes + " bytes read");
 
                 if (nbBytes > 0) {
                     if (DEBUG)
@@ -136,6 +139,14 @@ public class ReceiveThread extends Thread {
                 else {
                     if (DEBUG)
                         Log.d(TAG, "No data to read");
+                }
+
+                try {
+                    if (DEBUG)
+                        Log.d(TAG, "Sleep " + SLEEP_TIME + " ms");
+                    Thread.sleep(SLEEP_TIME);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
             } // while (mRunning)
