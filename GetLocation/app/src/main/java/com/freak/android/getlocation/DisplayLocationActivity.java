@@ -23,9 +23,8 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 
-public class MyActivity extends Activity implements OnMapReadyCallback {
+public class DisplayLocationActivity extends Activity implements OnMapReadyCallback {
 
-    public static final String PREFERENCE_NAME = "asteroid_location";
     private TextView mText;
     private Button mButton;
     private ShareActionProvider mShareActionProvider;
@@ -35,7 +34,7 @@ public class MyActivity extends Activity implements OnMapReadyCallback {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my);
+        setContentView(R.layout.activity_display_location);
         mText = (TextView) findViewById(R.id.text);
         mButton = (Button) findViewById(R.id.go_maps);
         mMap = (MapView) findViewById(R.id.map);
@@ -77,7 +76,7 @@ public class MyActivity extends Activity implements OnMapReadyCallback {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.my, menu);
+        getMenuInflater().inflate(R.menu.menu_display_location, menu);
         // Locate MenuItem with ShareActionProvider
         MenuItem item = menu.findItem(R.id.menu_item_share);
         // Fetch and store ShareActionProvider
@@ -106,7 +105,7 @@ public class MyActivity extends Activity implements OnMapReadyCallback {
     }
 
     private void refresh() {
-        SharedPreferences pref = getSharedPreferences(PREFERENCE_NAME, 0);
+        SharedPreferences pref = getSharedPreferences(getString(R.string.key_preferences), 0);
         final Double latitude = Double.longBitsToDouble(pref.getLong("latitude", Double.doubleToLongBits(0.0)));
         final Double longitude = Double.longBitsToDouble(pref.getLong("longitude", Double.doubleToLongBits(0.0)));
         final Double accuracy = Double.longBitsToDouble(pref.getLong("accuracy", Double.doubleToLongBits(0.0)));
@@ -118,7 +117,7 @@ public class MyActivity extends Activity implements OnMapReadyCallback {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                        Uri.parse("geo:0,0?q=" + latitude + "," + longitude + " (" + MyActivity.this.getString(R.string.my_car) + ")"));
+                        Uri.parse("geo:0,0?q=" + latitude + "," + longitude + " (" + DisplayLocationActivity.this.getString(R.string.my_car) + ")"));
                 startActivity(intent);
             }
         });
@@ -129,7 +128,7 @@ public class MyActivity extends Activity implements OnMapReadyCallback {
     public void sharePosition() {
         Intent shareIntent;
         if (mShareActionProvider != null) {
-            SharedPreferences pref = getSharedPreferences(PREFERENCE_NAME, 0);
+            SharedPreferences pref = getSharedPreferences(getString(R.string.key_preferences), 0);
             final Double latitude = Double.longBitsToDouble(pref.getLong("latitude", Double.doubleToLongBits(0.0)));
             final Double longitude = Double.longBitsToDouble(pref.getLong("longitude", Double.doubleToLongBits(0.0)));
 
@@ -143,7 +142,7 @@ public class MyActivity extends Activity implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap map) {
-        SharedPreferences pref = getSharedPreferences(PREFERENCE_NAME, 0);
+        SharedPreferences pref = getSharedPreferences(getString(R.string.key_preferences), 0);
         final Double latitude = Double.longBitsToDouble(pref.getLong("latitude", Double.doubleToLongBits(0.0)));
         final Double longitude = Double.longBitsToDouble(pref.getLong("longitude", Double.doubleToLongBits(0.0)));
         final Double accuracy = Double.longBitsToDouble(pref.getLong("accuracy", Double.doubleToLongBits(0.0)));

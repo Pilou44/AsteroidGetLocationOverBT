@@ -14,7 +14,7 @@ public class StatisticsManager {
     public StatisticsManager(Context context){
         mContext = context;
 
-        SharedPreferences pref = context.getSharedPreferences(MyActivity.PREFERENCE_NAME, 0);
+        SharedPreferences pref = context.getSharedPreferences(mContext.getString(R.string.key_preferences), 0);
         mEditor = pref.edit();
 
         mConnectionTimeout = pref.getInt(context.getString(R.string.key_connection_timeout), 0);

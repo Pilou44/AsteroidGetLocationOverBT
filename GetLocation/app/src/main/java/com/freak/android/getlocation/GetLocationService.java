@@ -12,7 +12,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.UUID;
 
-public class MyService extends Service implements ReceiveThreadListener {
+public class GetLocationService extends Service implements ReceiveThreadListener {
     private static final String TAG = "MY_SERVICE";
     private static final boolean DEBUG = true;
 
@@ -90,7 +90,7 @@ public class MyService extends Service implements ReceiveThreadListener {
             if (DEBUG)
                 Log.d(TAG, "First connection successful, make service not killable");
 
-            Intent intent = new Intent(this, MyActivity.class);
+            Intent intent = new Intent(this, DisplayLocationActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);

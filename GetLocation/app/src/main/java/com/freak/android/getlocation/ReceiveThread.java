@@ -38,7 +38,7 @@ public class ReceiveThread extends Thread {
     public void run() {
         Log.i(TAG, "Run thread");
 
-        SharedPreferences pref = mContext.getSharedPreferences(MyActivity.PREFERENCE_NAME, 0);
+        SharedPreferences pref = mContext.getSharedPreferences(mContext.getString(R.string.key_preferences), 0);
         SharedPreferences.Editor editor = pref.edit();
 
         int nbBytes;

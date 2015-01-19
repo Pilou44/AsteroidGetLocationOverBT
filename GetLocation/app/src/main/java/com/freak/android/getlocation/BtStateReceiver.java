@@ -6,11 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-public class MyReceiver extends BroadcastReceiver {
+public class BtStateReceiver extends BroadcastReceiver {
     private static final String TAG = "BT_RECEIVER";
     private static final boolean DEBUG = true;
 
-    public MyReceiver() {
+    public BtStateReceiver() {
     }
 
     @Override
@@ -23,19 +23,19 @@ public class MyReceiver extends BroadcastReceiver {
         if (connectionState == BluetoothAdapter.STATE_CONNECTED) {
             if (DEBUG)
                 Log.d(TAG, "Connected to BT device");
-            Intent newIntent = new Intent(context, MyService.class);
+            Intent newIntent = new Intent(context, GetLocationService.class);
             context.startService(newIntent);
         }
         else if (connectionState == BluetoothAdapter.STATE_DISCONNECTED) {
             if (DEBUG)
                 Log.d(TAG, "Disconnected from BT device");
-            Intent newIntent = new Intent(context, MyService.class);
+            Intent newIntent = new Intent(context, GetLocationService.class);
             context.stopService(newIntent);
         }
         else if (btState == BluetoothAdapter.STATE_OFF) {
             if (DEBUG)
                 Log.d(TAG, "BT off");
-            Intent newIntent = new Intent(context, MyService.class);
+            Intent newIntent = new Intent(context, GetLocationService.class);
             context.stopService(newIntent);
         }
 

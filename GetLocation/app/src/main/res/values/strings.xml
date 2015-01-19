@@ -4,6 +4,7 @@
     <string name="accuracy_unit" translatable="false">&#160;m</string>
     <string name="lat_lng_unit" translatable="false">°</string>
     <string name="time_unit" translatable="false">&#160;ms</string>
+    <string name="key_preferences" translatable="false">asteroid_location</string>
     <string name="key_connection_timeout" translatable="false">connection_timeout</string>
     <string name="key_received_locations" translatable="false">received_locations</string>
     <string name="key_min_time" translatable="false">min_time</string>
