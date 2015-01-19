@@ -21,6 +21,7 @@ public class ReceiveThread extends Thread {
 
     private final Context mContext;
     private final BluetoothServerSocket mServerSocket;
+    private final StatisticsManager mStatsManager;
     private boolean mRunning;
     private ReceiveThreadListener mListener = null;
 
@@ -29,6 +30,7 @@ public class ReceiveThread extends Thread {
             Log.d(TAG, "Create thread");
         mContext = context;
         mServerSocket = serverSocket;
+        mStatsManager = ((GetLocationApplication)context.getApplicationContext()).getStatisticsManager();
         mRunning = false;
     }
 
@@ -38,11 +40,6 @@ public class ReceiveThread extends Thread {
 
         SharedPreferences pref = mContext.getSharedPreferences(MyActivity.PREFERENCE_NAME, 0);
         SharedPreferences.Editor editor = pref.edit();
-
-        int connectionTimeout;
-        int receivedLocations;
-        int minTimeToReceive;
-        int maxTimeToReceive;
 
         int nbBytes;
 
@@ -54,12 +51,11 @@ public class ReceiveThread extends Thread {
                 Log.d(TAG, "Waiting for connection");
             socket = mServerSocket.accept(CONNECTION_TIMEOUT);
         } catch (IOException e) {
-            Log.e(TAG, "No connection for " + (CONNECTION_TIMEOUT/1000) + " s, aborting");
+            Log.e(TAG, "No connection for " + (CONNECTION_TIMEOUT / 1000) + " s, aborting");
             e.printStackTrace();
-            connectionTimeout = pref.getInt(mContext.getString(R.string.key_connection_timeout), 0);
-            connectionTimeout++;
-            editor.putInt(mContext.getString(R.string.key_connection_timeout), connectionTimeout);
-            editor.apply();
+
+            mStatsManager.incConnectionTimeout();
+
             mRunning = false;
         }
 
@@ -104,18 +100,13 @@ public class ReceiveThread extends Thread {
                     long currentTime = new GregorianCalendar().getTimeInMillis();
                     if (lastTime > 0) {
                         int timeToReceive = (int)(currentTime - lastTime);
-                        minTimeToReceive = pref.getInt(mContext.getString(R.string.key_min_time), Integer.MAX_VALUE);
-                        maxTimeToReceive = pref.getInt(mContext.getString(R.string.key_max_time), 0);
-                        if (timeToReceive < minTimeToReceive) {
-                            minTimeToReceive = timeToReceive;
-                            editor.putInt(mContext.getString(R.string.key_min_time), minTimeToReceive);
+                        if (timeToReceive < mStatsManager.getMinTimeToReceive()) {
+                            mStatsManager.setMinTimeToReceive(timeToReceive);
                         }
-                        if (timeToReceive > maxTimeToReceive) {
-                            maxTimeToReceive = timeToReceive;
-                            editor.putInt(mContext.getString(R.string.key_max_time), maxTimeToReceive);
+                        if (timeToReceive > mStatsManager.getMaxTimeToReceive()) {
+                            mStatsManager.setMaxTimeToReceive(timeToReceive);
                         }
-                        editor.putInt(mContext.getString(R.string.key_last_time), timeToReceive);
-                        editor.apply();
+                        mStatsManager.setLastTimeToReceive(timeToReceive);
                     }
                     lastTime = currentTime;
 
@@ -131,10 +122,8 @@ public class ReceiveThread extends Thread {
                     editor.putLong("latitude", Double.doubleToRawLongBits(location.getLatitude()));
                     editor.putLong("longitude", Double.doubleToRawLongBits(location.getLongitude()));
                     editor.putLong("accuracy", Double.doubleToRawLongBits(location.getAccuracy()));
-                    receivedLocations = pref.getInt(mContext.getString(R.string.key_received_locations), 0);
-                    receivedLocations++;
-                    editor.putInt(mContext.getString(R.string.key_received_locations), receivedLocations);
                     editor.apply();
+                    mStatsManager.incReceivedLocations();
                 }
                 else {
                     if (DEBUG)

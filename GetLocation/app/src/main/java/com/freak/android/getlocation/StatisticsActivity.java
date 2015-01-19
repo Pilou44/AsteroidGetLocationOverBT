@@ -1,7 +1,6 @@
 package com.freak.android.getlocation;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,11 +10,14 @@ import android.widget.TextView;
 public class StatisticsActivity extends Activity {
 
     private TextView mText;
+    private StatisticsManager mStatsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
+
+        mStatsManager = ((GetLocationApplication)getApplicationContext()).getStatisticsManager();
 
         mText = (TextView) findViewById(R.id.text_stats);
     }
@@ -41,7 +43,7 @@ public class StatisticsActivity extends Activity {
             return true;
         }
         else if (id == R.id.action_clear) {
-            clear();
+            mStatsManager.clear();
             refresh();
             return true;
         }
@@ -49,33 +51,13 @@ public class StatisticsActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void clear() {
-        SharedPreferences pref = this.getSharedPreferences(MyActivity.PREFERENCE_NAME, 0);
-        SharedPreferences.Editor editor = pref.edit();
-
-        editor.putInt(getString(R.string.key_connection_timeout), 0);
-        editor.putInt(getString(R.string.key_received_locations), 0);
-        editor.putInt(getString(R.string.key_min_time), Integer.MAX_VALUE);
-        editor.putInt(getString(R.string.key_max_time), 0);
-        editor.putInt(getString(R.string.key_last_time), 0);
-        editor.apply();
-    }
-
     private void refresh() {
-
-        SharedPreferences pref = getSharedPreferences(MyActivity.PREFERENCE_NAME, 0);
-        int connectionTimeout = pref.getInt(getString(R.string.key_connection_timeout), 0);
-        int receivedLocations = pref.getInt(getString(R.string.key_received_locations), 0);
-        int minTimeToReceive = pref.getInt(getString(R.string.key_min_time), 0);
-        int maxTimeToReceive = pref.getInt(getString(R.string.key_max_time), 0);
-        int lastTimeToReceive = pref.getInt(getString(R.string.key_last_time), 0);
-
         mText.setText("" +
-                getText(R.string.connection_timeout) + connectionTimeout + "\n" +
-                getText(R.string.received_locations) + receivedLocations +  "\n" +
-                getText(R.string.min_time_to_receive) + minTimeToReceive + getText(R.string.time_unit) + "\n" +
-                getText(R.string.max_time_to_receive) + maxTimeToReceive + getText(R.string.time_unit) + "\n" +
-                getText(R.string.last_time_to_receive) + lastTimeToReceive + getText(R.string.time_unit)
+                getText(R.string.connection_timeout) + mStatsManager.getConnectionTimeout() + "\n" +
+                getText(R.string.received_locations) + mStatsManager.getReceivedLocations() +  "\n" +
+                getText(R.string.min_time_to_receive) + mStatsManager.getMinTimeToReceive() + getText(R.string.time_unit) + "\n" +
+                getText(R.string.max_time_to_receive) + mStatsManager.getMaxTimeToReceive() + getText(R.string.time_unit) + "\n" +
+                getText(R.string.last_time_to_receive) + mStatsManager.getLastTimeToReceive() + getText(R.string.time_unit)
         );
     }
 
