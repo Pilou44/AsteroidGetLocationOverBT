@@ -5,4 +5,16 @@
     <string name="notif_title">Envoi de la localisation</string>
     <string name="notif_text">Envoi de la localisation par bluetooth</string>
 
+    <string name="state">Etat :&#160;</string>
+    <string name="sent_locations">Positions envoyées :&#160;</string>
+    <string name="last_transmission">Dernier envoie :&#160;</string>
+    <string name="no_connected_device">Pas de mobile connecté</string>
+    <string name="state_connected">connecté</string>
+    <string name="state_location_receiver">en attente de position</string>
+    <string name="state_disconnected">déconnecté</string>
+    <string name="state_unknown">inconnu</string>
+    <string name="no_information">Pas d\'information à afficher</string>
+
+    <string name="action_settings">Paramètres</string>
+
 </resources>

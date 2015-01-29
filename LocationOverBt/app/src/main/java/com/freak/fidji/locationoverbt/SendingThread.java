@@ -1,6 +1,5 @@
 package com.freak.fidji.locationoverbt;
 
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.location.Location;
@@ -10,6 +9,7 @@ import android.util.Log;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.GregorianCalendar;
 import java.util.UUID;
 
 public class SendingThread extends Thread {
@@ -19,12 +19,12 @@ public class SendingThread extends Thread {
     private static final UUID MY_UUID = UUID.fromString("4364cf1a-7621-11e4-b116-123b93f75cba");
     private static final long TIME_BETWEEN_TO_SENDS = 15000;
     private static final long WAIT_FOR_SERVER = 30000;
-    private final BluetoothDevice mDevice;
+    private final LocationDevice mDevice;
     private final Context mContext;
     private boolean mRunning;
     private SendingThreadListener mListener;
 
-    public SendingThread(Context context, BluetoothDevice device) {
+    public SendingThread(Context context, LocationDevice device) {
         if (DEBUG)
             Log.d(TAG, "Create thread for device " + device.getAddress());
         mContext = context;
@@ -68,6 +68,7 @@ public class SendingThread extends Thread {
                 Log.d(TAG, "Connect socket " + mDevice.getAddress());
             try {
                 socket.connect();
+                mDevice.setState(LocationDevice.STATE_LOCATION_RECEIVER);
                 if (mListener != null) {
                     if (DEBUG)
                         Log.d(TAG, "Inform service that connection is successful for device " + mDevice.getAddress());
@@ -107,6 +108,8 @@ public class SendingThread extends Thread {
                     try {
                         dOut.write(bytes, 0, bytes.length);
                         dOut.flush();
+                        mDevice.incrementTransmissions();
+                        mDevice.setLastTransmission(new GregorianCalendar());
                     } catch (IOException e) {
                         Log.e(TAG, "Error while sending datas for device " + mDevice.getAddress());
                         e.printStackTrace();
@@ -132,6 +135,10 @@ public class SendingThread extends Thread {
                 if (dOut != null)
                     dOut.close();
                 socket.close();
+
+                if (mDevice.getState() == LocationDevice.STATE_LOCATION_RECEIVER)
+                    mDevice.setState(LocationDevice.STATE_CONNECTED);
+
             } catch (IOException e) {
                 Log.e(TAG, "Error while closing socket " + mDevice.getAddress());
                 e.printStackTrace();

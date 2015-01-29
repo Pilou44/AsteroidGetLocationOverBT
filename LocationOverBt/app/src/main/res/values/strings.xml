@@ -5,4 +5,16 @@
     <string name="notif_title">Sending car location</string>
     <string name="notif_text">Sending car location over bluetooth</string>
 
+    <string name="state">State:&#160;</string>
+    <string name="sent_locations">Sent locations:&#160;</string>
+    <string name="last_transmission">Last sending:&#160;</string>
+    <string name="no_connected_device">No connected device</string>
+    <string name="state_connected">connected</string>
+    <string name="state_location_receiver">waiting for location</string>
+    <string name="state_disconnected">disconnected</string>
+    <string name="state_unknown">unknown</string>
+    <string name="no_information">No information to display</string>
+
+    <string name="action_settings">Settings</string>
+
 </resources>

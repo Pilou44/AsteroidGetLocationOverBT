@@ -18,7 +18,7 @@ public class MyService extends Service implements SendingThreadListener{
 
     private final IBinder mBinder = new LocalBinder();
 
-    private Vector<BluetoothDevice> mConnectedDevices;
+    private Vector<LocationDevice> mConnectedDevices;
     private Vector<SendingThread> mSendingThreads;
     private boolean atLeastOneDeviceConnected;
 
@@ -40,15 +40,16 @@ public class MyService extends Service implements SendingThreadListener{
         if (DEBUG)
             Log.d(TAG, "Create service");
 
-        mConnectedDevices = new Vector<BluetoothDevice>();
+        mConnectedDevices = new Vector<LocationDevice>();
         mSendingThreads = new Vector<SendingThread>();
     }
 
     public void startThread(BluetoothDevice device) {
         if (DEBUG)
             Log.d(TAG, "Device connected");
-        mConnectedDevices.add(device);
-        SendingThread thread = new SendingThread(this, device);
+        LocationDevice locationDevice = new LocationDevice(device, LocationDevice.STATE_CONNECTED);
+        mConnectedDevices.add(locationDevice);
+        SendingThread thread = new SendingThread(this, locationDevice);
         thread.setListener(MyService.this);
 
         if (DEBUG)
@@ -65,13 +66,14 @@ public class MyService extends Service implements SendingThreadListener{
                 if (DEBUG)
                     Log.d(TAG, "Device identified, try to stop thread");
                 mSendingThreads.get(i).disconnect();
+                mConnectedDevices.get(i).setState(LocationDevice.STATE_DISCONNECTED);
                 break;
             }
         }
     }
 
     @Override
-    public void onThreadFinished(BluetoothDevice device) {
+    public void onThreadFinished(LocationDevice device) {
         if (DEBUG)
             Log.d(TAG, "onThreadFinished for device " + device.getAddress());
         for (int i = 0 ; i < mConnectedDevices.size() ; i++){
@@ -98,17 +100,25 @@ public class MyService extends Service implements SendingThreadListener{
     }
 
     @Override
-    public void onConnected(BluetoothDevice device) {
+    public void onConnected(LocationDevice device) {
         if (!atLeastOneDeviceConnected) {
             if (DEBUG)
                 Log.d(TAG, "A device has successfully connected, make service not killable");
             atLeastOneDeviceConnected = true;
 
             Notification notification = new Notification(R.drawable.ic_launcher, this.getString(R.string.notif_title), System.currentTimeMillis());
-            PendingIntent pi = PendingIntent.getService(this, 0, null, 0);
+            Intent intent = new Intent(this, StateActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
+            PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
             notification.setLatestEventInfo(this, this.getString(R.string.notif_title), this.getString(R.string.notif_text), pi);
 
             startForeground(291112, notification);
         }
+    }
+
+    public Vector<LocationDevice> getDevices() {
+        return mConnectedDevices;
     }
 }
