@@ -20,7 +20,7 @@ public class StateActivity extends Activity {
 
     private static final String TAG = "STATE_ACTIVITY";
     private static final boolean DEBUG = true;
-    private MyService mLocationService;
+    private LocationService mLocationService;
     private TextView mTextMobile1, mTextMobile2;
     private boolean mConnected;
     private Handler mHandler;
@@ -28,7 +28,7 @@ public class StateActivity extends Activity {
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mConnected = true;
-            mLocationService = ((MyService.LocalBinder)service).getService();
+            mLocationService = ((LocationService.LocalBinder)service).getService();
             mHandler.post(mRunnable);
         }
 
@@ -60,7 +60,7 @@ public class StateActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        Intent serviceIntent = new Intent(this, MyService.class);
+        Intent serviceIntent = new Intent(this, LocationService.class);
         bindService(serviceIntent, mConnection, 0);
     }
 

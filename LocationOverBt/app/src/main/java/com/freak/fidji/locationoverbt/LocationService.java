@@ -11,7 +11,7 @@ import android.util.Log;
 
 import java.util.Vector;
 
-public class MyService extends Service implements SendingThreadListener{
+public class LocationService extends Service implements SendingThreadListener{
 
     private static final String TAG = "LOCATION_OVER_BT";
     private static final boolean DEBUG = true;
@@ -23,8 +23,8 @@ public class MyService extends Service implements SendingThreadListener{
     private boolean atLeastOneDeviceConnected;
 
     public class LocalBinder extends Binder {
-        MyService getService() {
-            return MyService.this;
+        LocationService getService() {
+            return LocationService.this;
         }
     }
 
@@ -50,7 +50,7 @@ public class MyService extends Service implements SendingThreadListener{
         LocationDevice locationDevice = new LocationDevice(device, LocationDevice.STATE_CONNECTED);
         mConnectedDevices.add(locationDevice);
         SendingThread thread = new SendingThread(this, locationDevice);
-        thread.setListener(MyService.this);
+        thread.setListener(this);
 
         if (DEBUG)
             Log.d(TAG, "Start thread for device " + (mConnectedDevices.size() - 1));

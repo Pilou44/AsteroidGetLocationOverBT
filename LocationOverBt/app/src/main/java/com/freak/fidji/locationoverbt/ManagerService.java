@@ -30,7 +30,7 @@ public class ManagerService extends IntentService implements ServiceConnection{
             mState = intent.getStringExtra(BtEventsReceiver.ACTION_EXTRA);
             mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-            Intent serviceIntent = new Intent(this, MyService.class);
+            Intent serviceIntent = new Intent(this, LocationService.class);
             if (DEBUG)
                 Log.d(TAG, "Start service");
             this.startService(serviceIntent);
@@ -44,16 +44,16 @@ public class ManagerService extends IntentService implements ServiceConnection{
         if (DEBUG)
             Log.d(TAG, "Service connected");
 
-        MyService myService = ((MyService.LocalBinder)service).getService();
+        LocationService locationService = ((LocationService.LocalBinder)service).getService();
         if (mState.equals(BluetoothDevice.ACTION_ACL_CONNECTED)){
             if (DEBUG)
                 Log.d(TAG, "Start thread");
-            myService.startThread(mDevice);
+            locationService.startThread(mDevice);
         }
         else if (mState.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)){
             if (DEBUG)
                 Log.d(TAG, "Stop thread");
-            myService.stopThread(mDevice);
+            locationService.stopThread(mDevice);
         }
         else {
             if (DEBUG)
