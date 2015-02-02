@@ -9,13 +9,14 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
-public class ManagerService extends IntentService {
+public class ManagerService extends IntentService implements ServiceConnection{
 
     private static final boolean DEBUG = true;
     private static final String TAG = "MANAGER_SERVICE";
 
     private String mState;
     private BluetoothDevice mDevice;
+    private boolean isBound;
 
     public ManagerService() {
         super("ManagerService");
@@ -35,43 +36,45 @@ public class ManagerService extends IntentService {
             this.startService(serviceIntent);
             if (DEBUG)
                 Log.d(TAG, "Bind service");
-            this.bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+            this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
         }
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            if (DEBUG)
-                Log.d(TAG, "Service connected");
+    public void onServiceConnected(ComponentName className, IBinder service) {
+        if (DEBUG)
+            Log.d(TAG, "Service connected");
 
-            MyService myService = ((MyService.LocalBinder)service).getService();
-            if (mState.equals(BluetoothDevice.ACTION_ACL_CONNECTED)){
-                if (DEBUG)
-                    Log.d(TAG, "Start thread");
-                myService.startThread(mDevice);
-            }
-            else if (mState.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)){
-                if (DEBUG)
-                    Log.d(TAG, "Stop thread");
-                myService.stopThread(mDevice);
-            }
-            else {
-                if (DEBUG)
-                    Log.d(TAG, "Unknown action");
-            }
-            ManagerService.this.unbindService(mConnection);
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
+        MyService myService = ((MyService.LocalBinder)service).getService();
+        if (mState.equals(BluetoothDevice.ACTION_ACL_CONNECTED)){
             if (DEBUG)
-                Log.d(TAG, "Service disconnected");
+                Log.d(TAG, "Start thread");
+            myService.startThread(mDevice);
         }
-    };
+        else if (mState.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)){
+            if (DEBUG)
+                Log.d(TAG, "Stop thread");
+            myService.stopThread(mDevice);
+        }
+        else {
+            if (DEBUG)
+                Log.d(TAG, "Unknown action");
+        }
+        isBound = true;
+        stopSelf();
+    }
+
+    public void onServiceDisconnected(ComponentName className) {
+        if (DEBUG)
+            Log.d(TAG, "Service disconnected");
+        isBound = false;
+    }
 
     @Override
     public void onDestroy() {
         if (DEBUG)
             Log.d(TAG, "Destroy service");
+        if (isBound)
+            unbindService(this);
         super.onDestroy();
     }
 
