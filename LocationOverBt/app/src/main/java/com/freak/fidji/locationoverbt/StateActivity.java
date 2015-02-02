@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -17,6 +18,8 @@ import java.util.Vector;
 
 public class StateActivity extends Activity {
 
+    private static final String TAG = "STATE_ACTIVITY";
+    private static final boolean DEBUG = true;
     private MyService mLocationService;
     private TextView mTextMobile1, mTextMobile2;
     private boolean mConnected;
@@ -91,6 +94,9 @@ public class StateActivity extends Activity {
     }
 
     private void refresh() {
+        if (DEBUG)
+            Log.d(TAG, "refresh");
+
         Vector<LocationDevice> connectedDevices = mLocationService.getDevices();
         LocationDevice device;
         String text;
