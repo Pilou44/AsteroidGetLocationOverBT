@@ -31,6 +31,7 @@ public class StateActivity extends Activity {
 
         public void onServiceDisconnected(ComponentName className) {
             mConnected = false;
+            mHandler.removeCallbacks(mRunnable);
         }
     };
 
