@@ -37,6 +37,16 @@ public class ManagerService extends IntentService implements ServiceConnection{
             if (DEBUG)
                 Log.d(TAG, "Bind service");
             this.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
+
+            while (!isBound){
+                try {
+                    if (DEBUG)
+                        Log.d(TAG, "Sleep");
+                    Thread.sleep(10);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -60,7 +70,6 @@ public class ManagerService extends IntentService implements ServiceConnection{
                 Log.d(TAG, "Unknown action");
         }
         isBound = true;
-        stopSelf();
     }
 
     public void onServiceDisconnected(ComponentName className) {
