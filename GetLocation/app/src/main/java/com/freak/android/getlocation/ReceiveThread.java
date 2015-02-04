@@ -122,6 +122,7 @@ public class ReceiveThread extends Thread {
                     editor.putLong(mContext.getString(R.string.key_latitude), Double.doubleToRawLongBits(location.getLatitude()));
                     editor.putLong(mContext.getString(R.string.key_longitude), Double.doubleToRawLongBits(location.getLongitude()));
                     editor.putLong(mContext.getString(R.string.key_accuracy), Double.doubleToRawLongBits(location.getAccuracy()));
+                    editor.putLong(mContext.getString(R.string.key_date), new GregorianCalendar().getTimeInMillis());
                     editor.apply();
                     mStatsManager.incReceivedLocations();
                 }

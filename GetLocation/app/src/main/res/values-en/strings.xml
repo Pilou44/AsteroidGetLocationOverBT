@@ -21,5 +21,7 @@
     <string name="max_time_to_receive">Maximum time between two receptions:&#160;</string>
     <string name="last_time_to_receive">Last time between two receptions:&#160;</string>
     <string name="received_locations">Received locations:&#160;</string>
+    <string name="date">Last location received on&#160;</string>
+    <string name="time">&#160;at&#160;</string>
 
 </resources>

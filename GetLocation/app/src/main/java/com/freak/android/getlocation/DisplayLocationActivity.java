@@ -23,6 +23,9 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.text.DateFormat;
+import java.util.GregorianCalendar;
+
 public class DisplayLocationActivity extends Activity implements OnMapReadyCallback {
 
     private TextView mText;
@@ -109,10 +112,16 @@ public class DisplayLocationActivity extends Activity implements OnMapReadyCallb
         final Double latitude = Double.longBitsToDouble(pref.getLong(getString(R.string.key_latitude), Double.doubleToLongBits(0.0)));
         final Double longitude = Double.longBitsToDouble(pref.getLong(getString(R.string.key_longitude), Double.doubleToLongBits(0.0)));
         final Double accuracy = Double.longBitsToDouble(pref.getLong(getString(R.string.key_accuracy), Double.doubleToLongBits(0.0)));
+        GregorianCalendar date = new GregorianCalendar();
+        date.setTimeInMillis(pref.getLong(getString(R.string.key_date), 0));
 
         float accuracyM = ((float)((int)(accuracy * 100))) / 100;
 
-        mText.setText(getText(R.string.latitude_value) + latitude.toString() + getText(R.string.lat_lng_unit) + "\n" + getText(R.string.longitude_value) + longitude.toString() + getText(R.string.lat_lng_unit) + "\n" + getText(R.string.accuracy_value) + accuracyM + getText(R.string.accuracy_unit));
+        mText.setText(
+                getText(R.string.latitude_value) + latitude.toString() + getText(R.string.lat_lng_unit) + "\n" +
+                getText(R.string.longitude_value) + longitude.toString() + getText(R.string.lat_lng_unit) + "\n" +
+                getText(R.string.accuracy_value) + accuracyM + getText(R.string.accuracy_unit) + "\n" +
+                getText(R.string.date) + getDate(date) + getText(R.string.time)  + getTime(date));
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -123,6 +132,16 @@ public class DisplayLocationActivity extends Activity implements OnMapReadyCallb
         });
 
         mMap.getMapAsync(this);
+    }
+
+    private String getDate(GregorianCalendar date) {
+        DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(this);
+        return dateFormat.getDateInstance().format(date.getTime());
+    }
+
+    private String getTime(GregorianCalendar date) {
+        DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(this);
+        return dateFormat.getTimeInstance().format(date.getTime());
     }
 
     public void sharePosition() {
