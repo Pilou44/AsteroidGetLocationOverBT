@@ -10,6 +10,10 @@
     <string name="key_min_time" translatable="false">min_time</string>
     <string name="key_max_time" translatable="false">max_time</string>
     <string name="key_last_time" translatable="false">last_time</string>
+    <string name="key_latitude" translatable="false">latitude</string>
+    <string name="key_longitude" translatable="false">longitude</string>
+    <string name="key_accuracy" translatable="false">accuracy</string>
+    <string name="key_date" translatable="false">date</string>
 
     <string name="app_name">Location of your car</string>
     <string name="unknown_position">Latitude: Unknown\nLongitude: Unknown\nAccuracy: Unknown</string>

@@ -106,9 +106,9 @@ public class DisplayLocationActivity extends Activity implements OnMapReadyCallb
 
     private void refresh() {
         SharedPreferences pref = getSharedPreferences(getString(R.string.key_preferences), 0);
-        final Double latitude = Double.longBitsToDouble(pref.getLong("latitude", Double.doubleToLongBits(0.0)));
-        final Double longitude = Double.longBitsToDouble(pref.getLong("longitude", Double.doubleToLongBits(0.0)));
-        final Double accuracy = Double.longBitsToDouble(pref.getLong("accuracy", Double.doubleToLongBits(0.0)));
+        final Double latitude = Double.longBitsToDouble(pref.getLong(getString(R.string.key_latitude), Double.doubleToLongBits(0.0)));
+        final Double longitude = Double.longBitsToDouble(pref.getLong(getString(R.string.key_longitude), Double.doubleToLongBits(0.0)));
+        final Double accuracy = Double.longBitsToDouble(pref.getLong(getString(R.string.key_accuracy), Double.doubleToLongBits(0.0)));
 
         float accuracyM = ((float)((int)(accuracy * 100))) / 100;
 
@@ -129,8 +129,8 @@ public class DisplayLocationActivity extends Activity implements OnMapReadyCallb
         Intent shareIntent;
         if (mShareActionProvider != null) {
             SharedPreferences pref = getSharedPreferences(getString(R.string.key_preferences), 0);
-            final Double latitude = Double.longBitsToDouble(pref.getLong("latitude", Double.doubleToLongBits(0.0)));
-            final Double longitude = Double.longBitsToDouble(pref.getLong("longitude", Double.doubleToLongBits(0.0)));
+            final Double latitude = Double.longBitsToDouble(pref.getLong(getString(R.string.key_latitude), Double.doubleToLongBits(0.0)));
+            final Double longitude = Double.longBitsToDouble(pref.getLong(getString(R.string.key_longitude), Double.doubleToLongBits(0.0)));
 
             shareIntent = new Intent(android.content.Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
@@ -143,9 +143,9 @@ public class DisplayLocationActivity extends Activity implements OnMapReadyCallb
     @Override
     public void onMapReady(GoogleMap map) {
         SharedPreferences pref = getSharedPreferences(getString(R.string.key_preferences), 0);
-        final Double latitude = Double.longBitsToDouble(pref.getLong("latitude", Double.doubleToLongBits(0.0)));
-        final Double longitude = Double.longBitsToDouble(pref.getLong("longitude", Double.doubleToLongBits(0.0)));
-        final Double accuracy = Double.longBitsToDouble(pref.getLong("accuracy", Double.doubleToLongBits(0.0)));
+        final Double latitude = Double.longBitsToDouble(pref.getLong(getString(R.string.key_latitude), Double.doubleToLongBits(0.0)));
+        final Double longitude = Double.longBitsToDouble(pref.getLong(getString(R.string.key_longitude), Double.doubleToLongBits(0.0)));
+        final Double accuracy = Double.longBitsToDouble(pref.getLong(getString(R.string.key_accuracy), Double.doubleToLongBits(0.0)));
 
         LatLng location = new LatLng(latitude, longitude);
 

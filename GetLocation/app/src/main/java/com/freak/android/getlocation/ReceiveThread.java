@@ -119,9 +119,9 @@ public class ReceiveThread extends Thread {
 
                     if (DEBUG)
                         Log.d(TAG, "Store location");
-                    editor.putLong("latitude", Double.doubleToRawLongBits(location.getLatitude()));
-                    editor.putLong("longitude", Double.doubleToRawLongBits(location.getLongitude()));
-                    editor.putLong("accuracy", Double.doubleToRawLongBits(location.getAccuracy()));
+                    editor.putLong(mContext.getString(R.string.key_latitude), Double.doubleToRawLongBits(location.getLatitude()));
+                    editor.putLong(mContext.getString(R.string.key_longitude), Double.doubleToRawLongBits(location.getLongitude()));
+                    editor.putLong(mContext.getString(R.string.key_accuracy), Double.doubleToRawLongBits(location.getAccuracy()));
                     editor.apply();
                     mStatsManager.incReceivedLocations();
                 }
