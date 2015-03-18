@@ -57,21 +57,17 @@ public class StatisticsManager {
         mEditor.apply();
     }
 
-    public void setMinTimeToReceive(int minTimeToReceive) {
-        mMinTimeToReceive = minTimeToReceive;
-        mEditor.putInt(mContext.getString(R.string.key_min_time), mMinTimeToReceive);
-        mEditor.apply();
-    }
-
-    public void setMaxTimeToReceive(int maxTimeToReceive) {
-        mMaxTimeToReceive = maxTimeToReceive;
-        mEditor.putInt(mContext.getString(R.string.key_max_time), mMaxTimeToReceive);
-        mEditor.apply();
-    }
-
     public void setLastTimeToReceive(int lastTimeToReceive) {
         mLastTimeToReceive = lastTimeToReceive;
         mEditor.putInt(mContext.getString(R.string.key_last_time), mLastTimeToReceive);
+        if (mLastTimeToReceive < mMinTimeToReceive) {
+            mMinTimeToReceive = mLastTimeToReceive;
+            mEditor.putInt(mContext.getString(R.string.key_min_time), mMinTimeToReceive);
+        }
+        if (mLastTimeToReceive > mMaxTimeToReceive) {
+            mMaxTimeToReceive = mLastTimeToReceive;
+            mEditor.putInt(mContext.getString(R.string.key_max_time), mMaxTimeToReceive);
+        }
         mEditor.apply();
     }
 

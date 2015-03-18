@@ -110,12 +110,6 @@ public class ReceiveThread extends Thread {
                     long currentTime = new GregorianCalendar().getTimeInMillis();
                     if (lastTime > 0) {
                         int timeToReceive = (int)(currentTime - lastTime);
-                        if (timeToReceive < mStatsManager.getMinTimeToReceive()) {
-                            mStatsManager.setMinTimeToReceive(timeToReceive);
-                        }
-                        if (timeToReceive > mStatsManager.getMaxTimeToReceive()) {
-                            mStatsManager.setMaxTimeToReceive(timeToReceive);
-                        }
                         mStatsManager.setLastTimeToReceive(timeToReceive);
                     }
                     lastTime = currentTime;
