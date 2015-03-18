@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.Parcel;
 import android.util.Log;
 
 import java.io.DataOutputStream;
@@ -55,6 +54,8 @@ public class SendingThread extends Thread {
         }
         socket = tmp;
 
+        int transaction = 0;
+
         if (socket != null) {
             try {
                 if (DEBUG)
@@ -97,16 +98,24 @@ public class SendingThread extends Thread {
                 Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
                 if (location != null) {
-                    if (DEBUG)
-                        Log.d(TAG, "Convert location to byte array " + mDevice.getAddress());
-                    Parcel parcel = Parcel.obtain();
-                    location.writeToParcel(parcel, 0);
-                    byte[] bytes = parcel.marshall();
 
-                    if (DEBUG)
+                    if (DEBUG) {
                         Log.d(TAG, "Send datas " + mDevice.getAddress());
+                        Log.d(TAG, "Transaction number " + transaction);
+                        Log.d(TAG, "Latitude\t: " + location.getLatitude());
+                        Log.d(TAG, "Longitude\t: " + location.getLongitude());
+                        Log.d(TAG, "Altitude\t: " + location.getAltitude());
+                        Log.d(TAG, "Accuracy\t: " + location.getAccuracy());
+                        Log.d(TAG, "Time\t: " + location.getTime());
+                    }
                     try {
-                        dOut.write(bytes, 0, bytes.length);
+                        dOut.writeInt(transaction);
+                        transaction++;
+                        dOut.writeDouble(location.getLatitude());
+                        dOut.writeDouble(location.getLongitude());
+                        dOut.writeDouble(location.getAltitude());
+                        dOut.writeDouble(location.getAccuracy());
+                        dOut.writeLong(location.getTime());
                         dOut.flush();
                         mDevice.incrementTransmissions();
                         mDevice.setLastTransmission(new GregorianCalendar());
