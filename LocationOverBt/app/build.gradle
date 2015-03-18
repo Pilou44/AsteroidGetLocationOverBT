@@ -8,8 +8,8 @@ android {
         applicationId "com.freak.fidji.locationoverbt"
         minSdkVersion 10
         targetSdkVersion 10
-        versionCode 212
-        versionName "2.1"
+        versionCode 300
+        versionName "3.0"
     }
     buildTypes {
         release {
